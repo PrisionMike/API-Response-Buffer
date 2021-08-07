@@ -37,3 +37,11 @@ and how each of the will *behave* 😋
 
 ## M1: The Tank and its peripherals.
 
+The tank is powered on using 2 arguments: **the API request text** and the
+**number of responses = N** to cache.
+Upon being turned on, a tank of size *N* is created. This tank is a queue.
+FIFO buffer.
+The program then makes *N* API requests and pushes the response of each request
+to the Q-tank. [ loop request and push N times]
+
+## M2: The fetch-from-tank API.
