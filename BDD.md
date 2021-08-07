@@ -32,3 +32,8 @@ values as and when requested.
 
 I guess I should now define the different modules the program will have
 and how each of the will *behave* 😋
+
+# Modules
+
+## M1: The Tank and its peripherals.
+
