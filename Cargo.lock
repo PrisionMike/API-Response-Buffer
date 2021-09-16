@@ -3,19 +3,19 @@
 version = 3
 
 [[package]]
+name = "Jhaadi"
+version = "0.1.0"
+dependencies = [
+ "clap",
+]
+
+[[package]]
 name = "ansi_term"
 version = "0.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ee49baf6cb617b853aa8d93bf420db2383fab46d314482ca2803b40d5fde979b"
 dependencies = [
  "winapi",
-]
-
-[[package]]
-name = "api_resp_buff"
-version = "0.1.0"
-dependencies = [
- "clap",
 ]
 
 [[package]]
