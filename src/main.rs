@@ -11,7 +11,12 @@ fn main() {
                 .short("i")
                 .long("api")
                 .takes_value(true)
-                .help("Just say 'Peechhe' and get it over with"))
+                .help("The API whose response you want to cache"))
+        .arg(Arg::with_name("capacity")
+                .short("n")
+                .long("size")
+                .takes_value(true)
+                .help("Number of Responses to cache"))
         .get_matches();
 
         let position = matches.value_of("naam").unwrap();
