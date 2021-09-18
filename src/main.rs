@@ -1,6 +1,15 @@
 use clap::{Arg, App};
+#[macro_use] extern crate rocket;
 
-fn main() {
+#[get("/")]
+fn ligma() -> &'static str {
+        "Fixed response on a fixed port.\nI've confirmed
+        neiter."
+}
+
+
+#[launch]
+fn rocket() -> _ {
     println!("Shree Ram Jaanki...");
 
     let matches = App::new("JHAADI")
@@ -19,8 +28,9 @@ fn main() {
                 .help("Number of Responses to cache"))
         .get_matches();
 
-        let position = matches.value_of("naam").unwrap();
-        println!("input received: {}", position);
+        let the_api = matches.value_of("theapi").unwrap_or("Jhingalala");
+        let cap = matches.value_of("capacity").unwrap_or("hu hu");
+        println!("input received: {}\n{}", the_api, cap);
 
-
+        rocket::build().mount("/", routes![ligma])
 }
