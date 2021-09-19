@@ -2,9 +2,13 @@ use clap::{Arg, App};
 #[macro_use] extern crate rocket;
 
 #[get("/")]
-fn ligma() -> &'static str {
-        "Fixed response on a fixed port.\nI've confirmed
-        neiter."
+fn ligma(param : &str) -> &'static str {
+        // let cstr: &'static str = "Fixed response on a fixed port.\nI've confirmed
+        // neiter.\nAlso\n";
+
+        // format!("Fixed response on a fixed port.\nI've confirmed neiter.\nAlso\n{}",param)
+
+        "Server started.\n Waiting for an input to build resources for."
 }
 
 
@@ -32,5 +36,7 @@ fn rocket() -> _ {
         let cap = matches.value_of("capacity").unwrap_or("hu hu");
         println!("input received: {}\n{}", the_api, cap);
 
+        let astr = "Mon kemoner jonmodin";
         rocket::build().mount("/", routes![ligma])
 }
+
