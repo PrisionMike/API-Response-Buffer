@@ -25,3 +25,11 @@ The *Main Program* will then make a POST request to the server with the valid in
 The server, upon receiving such a POST request will validate the input, make a separate resource
 dedicated to the input, and notify the main program, that such a resource has been generated successfully.  
 The server will then return the full address of the resource. This is the point the user will ping.
+
+### Figuring out the implementation - baby steps
+
+ - Make a destination (route) function for any POST request received at '/'.
+ - Use an app like Postman to send a POST request to it and see if it lands at the right destination.
+ - Try sending something in the body as well and see if you can display it on the screen.
+ - Make a separate function in the `main.rs` file for sending the POST request. The fucntion will probably be tokio async and will accept the input string to be sent as an argument.
+ 

@@ -11,6 +11,16 @@ fn ligma() -> &'static str {
         "Server started.\n Waiting for an input to build resources for."
 }
 
+#[post("/")]
+fn sugma() -> &'static str {
+        "We'll get back to you shortly"
+}
+
+// #[tokio::main]
+// async fn deeznuts() {
+        
+// }
+
 
 #[launch]
 fn rocket() -> _ {
