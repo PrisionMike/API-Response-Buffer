@@ -32,4 +32,9 @@ The server will then return the full address of the resource. This is the point 
  - Use an app like Postman to send a POST request to it and see if it lands at the right destination.
  - Try sending something in the body as well and see if you can display it on the screen.
  - Make a separate function in the `main.rs` file for sending the POST request. The fucntion will probably be tokio async and will accept the input string to be sent as an argument.
- 
+ - Separate function trick didn't work somehow.
+ ```
+ Err(reqwest::Error { kind: Request, url: Url { scheme: "http", cannot_be_a_base: false, username: "", password: None, host: Some(Ipv4(127.0.0.1)), port: Some(8000), path: "/", query: None, fragment: None }, source: hyper::Error(Connect, ConnectError("tcp connect error", Os { code: 10061, kind: ConnectionRefused, message: "No connection could be made because the 
+target machine actively refused it." })) })
+```
+- Let's try having a different file to post the request and see if that works. Later we'll figure out how to launch the server stably and passing this ready command internally. Good night.
