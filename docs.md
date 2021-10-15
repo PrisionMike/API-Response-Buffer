@@ -38,3 +38,6 @@ The server will then return the full address of the resource. This is the point 
 target machine actively refused it." })) })
 ```
 - Let's try having a different file to post the request and see if that works. Later we'll figure out how to launch the server stably and passing this ready command internally. Good night.
+
+- The POST works from a separate file. On a second thought, I don't need to communicate with a server I just created using a POST request. Let's just create a common POST 'match?' like `/newtank` with maybe like: `/newtank?api=https://lick.my.balls/?val=10&dick=7in&cap=10000"`. Seems tricky already? We'll figure.
+- Another issue is, when I launched the server with the basic `get(/)` resource, the POST now, doesn't work. I gotta figure that too.

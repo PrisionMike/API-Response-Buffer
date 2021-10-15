@@ -17,7 +17,7 @@ fn ligma() -> &'static str {
 
 #[post("/", data = "<apiurl>")]
 fn sugma(apiurl : &str) -> String {
-        format!("We'll get back to you shortly after we run: {}",apiurl)
+        format!("We'll get back to you shortly after we run 69: {}",apiurl)
 }
 
 /*
@@ -62,16 +62,16 @@ async fn rocket() -> _ {
         println!("input received: {}\n{}", the_api, cap);
 
         // let astr = "Mon kemoner jonmodin";
-        let kyahai = rocket::build().mount("/", routes![sugma]);
-        println!("{:?}",kyahai);
+        let kyahai = rocket::build().mount("/", routes![ligma]);
+        // println!("{:?}",kyahai);
 
-        println!("Let me sleep");
-        let onesec = std::time::Duration::from_secs(3);
-        std::thread::sleep(onesec);
-        println!("Hooray and up she rises");
-        let jiya = updog("elephant Camel Mongose", "http:127.0.0.1:8000");
-        let kyamila = jiya.await;
-        println!("{:?}",kyamila);
+        // println!("Let me sleep");
+        // let onesec = std::time::Duration::from_secs(3);
+        // std::thread::sleep(onesec);
+        // println!("Hooray and up she rises");
+        // let jiya = updog("elephant Camel Mongose", "http:127.0.0.1:8000");
+        // let kyamila = jiya.await;
+        // println!("{:?}",kyamila);
         kyahai
 }
 
