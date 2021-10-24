@@ -1,9 +1,10 @@
 use clap::{Arg, App};
 use reqwest;
+use std::collections::VecDeque;
 #[macro_use] extern crate rocket;
 
 #[get("/")]
-fn ligma() -> &'static str {
+fn _ligma() -> &'static str {
         /*
         let cstr: &'static str = "Fixed response on a fixed port.\nI've confirmed
         neiter.\nAlso\n";
@@ -27,14 +28,22 @@ async fn deeznuts() {
 }
 */
 
-async fn updog(body : &'static str, socketadd : &str) -> Result<reqwest::Response, Box<dyn std::error::Error>> {
-       let client = reqwest::Client::new();
-       let res = client.post(socketadd)
-                                .body(body)
-                                .send()
+// async fn updog(body : &'static str, socketadd : &str) -> Result<reqwest::Response, Box<dyn std::error::Error>> {
+//        let client = reqwest::Client::new();
+//        let res = client.post(socketadd)
+//                                 .body(body)
+//                                 .send()
+//                                 .await?;
+//         Ok(res)
+// }
+async fn updog(theapi : &str) -> Result<String, Box<dyn std::error::Error>> {
+        // let client = reqwest::Client::new();
+        let res = reqwest::get(theapi)
+                                .await?
+                                .text()
                                 .await?;
-        Ok(res)
-}
+         Ok(res)
+ }
 
 #[launch]
 #[tokio::main]
@@ -61,10 +70,17 @@ async fn rocket() -> _ {
         let cap = matches.value_of("capacity").unwrap_or("hu hu");
         println!("input received: {}\n{}", the_api, cap);
 
-        // let astr = "Mon kemoner jonmodin";
-        let kyahai = rocket::build().mount("/", routes![ligma]);
-        // println!("{:?}",kyahai);
+        // cap = ();
+        let capint : usize = usize::from_str_radix(cap, 10).unwrap();
+        let mut tank: VecDeque<String> = VecDeque::with_capacity(capint);
+        for _i in 1 .. capint {
+                let res = updog(the_api).await;
+                tank.push_back(res.unwrap());
+        }
 
+        // let astr = "Mon kemoner jonmodin";
+        let kyahai = rocket::build().mount("/", routes![sugma]);
+        // println!("{:?}",kyahai);
         // println!("Let me sleep");
         // let onesec = std::time::Duration::from_secs(3);
         // std::thread::sleep(onesec);
