@@ -3,8 +3,13 @@ use reqwest;
 use std::collections::VecDeque;
 #[macro_use] extern crate rocket;
 
+
+// HOW TO SEND ARGUMENTS TO A ROCKET MOUNTED METHOD!!!!
+
+
+
 #[get("/")]
-fn _ligma() -> &'static str {
+fn ligma() -> &'static str {
         /*
         let cstr: &'static str = "Fixed response on a fixed port.\nI've confirmed
         neiter.\nAlso\n";
@@ -18,7 +23,12 @@ fn _ligma() -> &'static str {
 
 #[post("/", data = "<apiurl>")]
 fn sugma(apiurl : &str) -> String {
-        format!("We'll get back to you shortly after we run 69: {}",apiurl)
+        format!("We'll get back to you shortly after we run: {}",apiurl)
+}
+
+#[get("/geralt")]
+fn ofrivia() -> (){
+        ()
 }
 
 /*
@@ -42,12 +52,14 @@ async fn updog(theapi : &str) -> Result<String, Box<dyn std::error::Error>> {
                                 .await?
                                 .text()
                                 .await?;
+        println!("What's updog?")
          Ok(res)
  }
 
-#[launch]
-#[tokio::main]
-async fn rocket() -> _ {
+// #[launch]
+// #[tokio::main]
+#[rocket::main]
+async fn main() -> () {
     println!("Shree Ram Jaanki...");
 
     let matches = App::new("JHAADI")
@@ -58,7 +70,8 @@ async fn rocket() -> _ {
                 .short("i")
                 .long("api")
                 .takes_value(true)
-                .help("The API whose response you want to cache"))
+                .help("The API whose response you want to cache\n
+                        Send the API in doublequotes."))
         .arg(Arg::with_name("capacity")
                 .short("n")
                 .long("size")
@@ -78,8 +91,7 @@ async fn rocket() -> _ {
                 tank.push_back(res.unwrap());
         }
 
-        // let astr = "Mon kemoner jonmodin";
-        let kyahai = rocket::build().mount("/", routes![sugma]);
+        let kyahai = rocket::build().mount("/", routes![sugma,ligma]);
         // println!("{:?}",kyahai);
         // println!("Let me sleep");
         // let onesec = std::time::Duration::from_secs(3);
@@ -88,6 +100,6 @@ async fn rocket() -> _ {
         // let jiya = updog("elephant Camel Mongose", "http:127.0.0.1:8000");
         // let kyamila = jiya.await;
         // println!("{:?}",kyamila);
-        kyahai
+        kyahai.launch().await;
 }
 
