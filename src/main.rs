@@ -26,17 +26,10 @@ fn sugma(apiurl : &str) -> String {
         format!("We'll get back to you shortly after we run: {}",apiurl)
 }
 
-#[get("/geralt")]
-fn ofrivia() -> (){
-        ()
-}
-
-/*
-#[tokio::main]
-async fn deeznuts() {
-        
-}
-*/
+// #[get("/geralt")]
+// fn ofrivia() -> (){
+//         ()
+// }
 
 // async fn updog(body : &'static str, socketadd : &str) -> Result<reqwest::Response, Box<dyn std::error::Error>> {
 //        let client = reqwest::Client::new();
@@ -46,13 +39,18 @@ async fn deeznuts() {
 //                                 .await?;
 //         Ok(res)
 // }
+
+// fn sayswhat( douche: VecDeque<String>) -> () {
+//         ()
+// }
+
 async fn updog(theapi : &str) -> Result<String, Box<dyn std::error::Error>> {
         // let client = reqwest::Client::new();
         let res = reqwest::get(theapi)
                                 .await?
                                 .text()
                                 .await?;
-        println!("What's updog?")
+        // println!("What's updog?");
          Ok(res)
  }
 
@@ -85,14 +83,23 @@ async fn main() -> () {
 
         // cap = ();
         let capint : usize = usize::from_str_radix(cap, 10).unwrap();
+        println!("{}",capint);
         let mut tank: VecDeque<String> = VecDeque::with_capacity(capint);
-        for _i in 1 .. capint {
+        for i in 1 .. capint {
                 let res = updog(the_api).await;
                 tank.push_back(res.unwrap());
+                println!("{}",i)
         }
 
-        let kyahai = rocket::build().mount("/", routes![sugma,ligma]);
-        // println!("{:?}",kyahai);
+        for _i in 1 .. capint {
+                let popped =  tank.pop_front();
+                if let Some(v) = popped {
+                        println!("{}",v);
+                }
+        }
+
+        // let kyahai = rocket::build().mount("/", routes![sugma,ligma]);
+
         // println!("Let me sleep");
         // let onesec = std::time::Duration::from_secs(3);
         // std::thread::sleep(onesec);
@@ -100,6 +107,6 @@ async fn main() -> () {
         // let jiya = updog("elephant Camel Mongose", "http:127.0.0.1:8000");
         // let kyamila = jiya.await;
         // println!("{:?}",kyamila);
-        kyahai.launch().await;
+        // kyahai.launch().await;
 }
 

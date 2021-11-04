@@ -41,3 +41,4 @@ target machine actively refused it." })) })
 
 - The POST works from a separate file. On a second thought, I don't need to communicate with a server I just created using a POST request. Let's just create a common POST 'match?' like `/newtank` with maybe like: `/newtank?api=https://lick.my.balls/?val=10&dick=7in&cap=10000"`. Seems tricky already? We'll figure.
 - Another issue is, when I launched the server with the basic `get(/)` resource, the POST now, doesn't work. I gotta figure that too.
+    - It turns out we can and should mount multiple methods to a rocket launch using simple comma(,) separator like passing multiple arguments. They can probably be added in another line too.
