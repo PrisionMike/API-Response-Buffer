@@ -82,13 +82,14 @@ async fn main() -> () {
         println!("input received: {}\n{}", the_api, cap);
 
         // cap = ();
-        let capint : usize = usize::from_str_radix(cap, 10).unwrap();
-        println!("{}",capint);
+        let mut capint : usize = usize::from_str_radix(cap, 10).unwrap();
+        capint += 1;
+        // println!("{}",capint);
         let mut tank: VecDeque<String> = VecDeque::with_capacity(capint);
         for i in 1 .. capint {
                 let res = updog(the_api).await;
                 tank.push_back(res.unwrap());
-                println!("{}",i)
+                // println!("{}",i)
         }
 
         for _i in 1 .. capint {
