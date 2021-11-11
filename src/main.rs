@@ -1,5 +1,6 @@
 use clap::{Arg, App};
 use reqwest;
+use rocket::data;
 use std::{collections::VecDeque, fmt};
 use serde::{Deserialize, Serialize};
 use serde_json;
@@ -7,15 +8,10 @@ use serde_json;
 
 
 trait Hisbullah: fmt::Display{}
-// trait Hisbullah {}
 impl Hisbullah for str {}   
-impl Hisbullah for usize {}
+impl Hisbullah for u16 {}
 impl Hisbullah for String {}
-// impl fmt::Display for Box<dyn Hisbullah> {
-//         fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-//             write!(f, "{}", self)
-//         }
-// }
+
 
 /*
 #[get("/")]
@@ -102,11 +98,13 @@ async fn main() -> () {
         let cap = matches.value_of("capacity").unwrap_or("hu hu");
         let dataf = matches.value_of("JSON_data_section");
         let datat = matches.value_of("data_type");
+        let mut extract = false;
         println!("input received:\n
                   API:  {}\n
                   Capacity: {}\n",&the_api,&cap);
         if let Some(v) = dataf {
                 println!("Data field: {}",v);
+                extract = true;
                 match datat {
                         Some(v) => println!("Data type: {}",v),
                         None => panic!("Provide the type of data using the -t or --datatype flag (int,str,hex,binary)")
@@ -116,24 +114,45 @@ async fn main() -> () {
 
         let capint : usize = usize::from_str_radix(cap, 10).unwrap() + 1;
         
-        let mut tank: VecDeque<Box<dyn Hisbullah>> = VecDeque::new();
+        let mut response_tank: VecDeque<String> = VecDeque::with_capacity(capint);
         for _i in 1 .. capint {
                 let res = updog(the_api).await;
-                tank.push_back(Box::new(res.unwrap()));
+                response_tank.push_back(res.unwrap());
         }
 
+        let mut data_tank: VecDeque<Box<dyn Hisbullah>> = VecDeque::new();
+        
+        if extract {
+                for _i in 1 .. capint {
+                        let respi = response_tank.pop_front();
+                        match respi {
+                            None => {
+                                    println!("Tank empty");
+                                    break;
+                            }
+                            Some(v) => {
+                                    let val = serde_json::from_str(v)?;
+                                    data_tank.push_back(val);
+                            }
+                        }
+                        
+                }
+        }
+        
+        while !data_tank.is_empty() {
+                let popdata = *data_tank.pop_front().unwrap();
+                println!("{}",popdata);
+        }
         // let data_tank: VecDeque<>
         
-        for _i in 1 .. capint {
-                // println!("We in here? {}",_i);
-                let popped =  tank.pop_front();
-                if let Some(v) = popped {
-                        // println!("What about here?");
-                        println!("{}",v);
-                        tank.push_back(v);
-                }
+        // for _i in 1 .. capint {
+        //         let popped =  response_tank.pop_front();
+        //         if let Some(v) = popped {
+        //                 println!("{}",v);
+        //                 response_tank.push_back(v);
+        //         }
                 
-        }
+        // }
         
         // Ok(())
         // let kyahai = rocket::build().mount("/", routes![sugma,ligma]);
