@@ -1,17 +1,31 @@
 use clap::{Arg, App};
 use reqwest;
-use rocket::data;
+// use rocket::data;
 use std::{collections::VecDeque, fmt};
-use serde::{Deserialize, Serialize};
-use serde_json;
-#[macro_use] extern crate rocket;
+use serde::{Deserialize};
+use serde_json::Value;
+// #[macro_use] extern crate rocket;
 
 
-trait Hisbullah: fmt::Display{}
-impl Hisbullah for str {}   
-impl Hisbullah for u16 {}
-impl Hisbullah for String {}
+// Using 'Trait objects' here is really unnecessary given a response will always have the same type
+// in a given collection. It is better we use generics. But since it SHOULD run, and it's a
+// learning project, let Trait objects remain. Maybe we could try with a generic later.
+// trait Hisbullah: fmt::Display{}
+// impl<'de> Deserialize<'_, T: ?Sized> for dyn Hisbullah{
+//         fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+//         where
+//                 D: serde::Deserializer<'de> {
+            
+//         }
+// }
 
+// impl Hisbullah for str {}   
+// impl Hisbullah for u16 {}
+// impl Hisbullah for String {}
+#[derive(Deserialize,Debug)]
+struct json_response<T> {
+        maal : T
+}
 
 /*
 #[get("/")]
@@ -120,7 +134,7 @@ async fn main() -> () {
                 response_tank.push_back(res.unwrap());
         }
 
-        let mut data_tank: VecDeque<Box<dyn Hisbullah>> = VecDeque::new();
+        let mut data_tank: VecDeque<json_response<_>> = VecDeque::new();
         
         if extract {
                 for _i in 1 .. capint {
@@ -131,8 +145,8 @@ async fn main() -> () {
                                     break;
                             }
                             Some(v) => {
-                                    let val = serde_json::from_str(v)?;
-                                    data_tank.push_back(val);
+                                    let val : Value = serde_json::from_str(&v).unwrap();
+                                    data_tank.push_back(val["data"]);
                             }
                         }
                         
@@ -140,7 +154,7 @@ async fn main() -> () {
         }
         
         while !data_tank.is_empty() {
-                let popdata = *data_tank.pop_front().unwrap();
+                let popdata = data_tank.pop_front().unwrap();
                 println!("{}",popdata);
         }
         // let data_tank: VecDeque<>
