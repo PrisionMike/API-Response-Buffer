@@ -1,16 +1,18 @@
 use clap::{Arg, App};
 use reqwest;
+// use rocket::catcher::Result;
 // use rocket::data;
-use std::{collections::VecDeque, fmt};
+use std::{collections::VecDeque,fmt};
 use serde::{Deserialize};
-use serde_json::Value;
+use serde::de::{self, Deserialize, Deserializer, Visitor, SeqAccess, MapAccess};
+use serde_json::{Deserializer, Value};
 // #[macro_use] extern crate rocket;
 
 
 // Using 'Trait objects' here is really unnecessary given a response will always have the same type
 // in a given collection. It is better we use generics. But since it SHOULD run, and it's a
 // learning project, let Trait objects remain. Maybe we could try with a generic later.
-// trait Hisbullah: fmt::Display{}
+trait Hisbullah: fmt::Display{}
 // impl<'de> Deserialize<'_, T: ?Sized> for dyn Hisbullah{
 //         fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
 //         where
@@ -19,13 +21,59 @@ use serde_json::Value;
 //         }
 // }
 
-// impl Hisbullah for str {}   
-// impl Hisbullah for u16 {}
-// impl Hisbullah for String {}
-#[derive(Deserialize,Debug)]
-struct json_response<T> {
-        maal : T
+impl Hisbullah for str {}   
+impl Hisbullah for u16 {}
+impl Hisbullah for String {}
+#[derive(Deserialize)]
+struct JsonResponse2{
+        maal : Box<dyn Hisbullah>
 }
+// impl<'de>  Deserialize<'de> for Hisbullah {
+//     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+//     where
+//             D: Deserializer<'de> {
+//         enum Field { maal }
+
+//         impl<'de> Deserializer<'de> for Field {
+//                 fn deserialize<D>(deserializer: D) -> Result<Field, D::Error>
+//                 where
+//                         D: Deserializer<'de>,
+//                 {
+//                         struct FieldVisitor;
+
+//                         impl<'de> Visitor<'de> for FieldVisitor {
+//                             type Valerie = Field;
+
+//                             fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+//                                 formatter.write_str("`maal`")
+//                             }
+
+//                             fn visit_string<E>(self, v: String) -> Result<Self::Value, E>
+//                             where
+//                                     E: de::Error, {
+//                                 match v {
+//                                     "maal" => Ok(Field::maal),
+//                                     _ => Err(de::Error::unknown_field(v, FIELDS)),
+//                                 }
+
+                                 
+//                             }
+//                         }
+
+//                         deserializer.deserialize_identifier(FieldVisitor)
+//                 }
+
+//         }
+        
+//         struct hisbulvisitor;
+
+//         impl<'de> Visitor<'de> for hisbulvisitor {
+//                 type Valerie = Hisbullah;
+
+                
+//         }
+//     }
+// }
 
 /*
 #[get("/")]
@@ -134,7 +182,7 @@ async fn main() -> () {
                 response_tank.push_back(res.unwrap());
         }
 
-        let mut data_tank: VecDeque<json_response<_>> = VecDeque::new();
+        let mut data_tank: VecDeque<&JsonResponse2<_>> = VecDeque::new();
         
         if extract {
                 for _i in 1 .. capint {
@@ -146,7 +194,7 @@ async fn main() -> () {
                             }
                             Some(v) => {
                                     let val : Value = serde_json::from_str(&v).unwrap();
-                                    data_tank.push_back(val["data"]);
+                                    data_tank.push_back( &JsonResponse2{ maal : val[ dataf.unwrap() ] } );
                             }
                         }
                         
@@ -155,7 +203,8 @@ async fn main() -> () {
         
         while !data_tank.is_empty() {
                 let popdata = data_tank.pop_front().unwrap();
-                println!("{}",popdata);
+                let u: JsonResponse2<u16>= serde_json::from_value(popdata.maal).unwrap();
+                println!("{:?}",u);
         }
         // let data_tank: VecDeque<>
         
