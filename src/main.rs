@@ -28,90 +28,7 @@ impl Hisbullah for String {}
 struct JsonResponse2{
         maal : Box<dyn Hisbullah>
 }
-// impl<'de>  Deserialize<'de> for Hisbullah {
-//     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-//     where
-//             D: Deserializer<'de> {
-//         enum Field { maal }
 
-//         impl<'de> Deserializer<'de> for Field {
-//                 fn deserialize<D>(deserializer: D) -> Result<Field, D::Error>
-//                 where
-//                         D: Deserializer<'de>,
-//                 {
-//                         struct FieldVisitor;
-
-//                         impl<'de> Visitor<'de> for FieldVisitor {
-//                             type Valerie = Field;
-
-//                             fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
-//                                 formatter.write_str("`maal`")
-//                             }
-
-//                             fn visit_string<E>(self, v: String) -> Result<Self::Value, E>
-//                             where
-//                                     E: de::Error, {
-//                                 match v {
-//                                     "maal" => Ok(Field::maal),
-//                                     _ => Err(de::Error::unknown_field(v, FIELDS)),
-//                                 }
-
-                                 
-//                             }
-//                         }
-
-//                         deserializer.deserialize_identifier(FieldVisitor)
-//                 }
-
-//         }
-        
-//         struct hisbulvisitor;
-
-//         impl<'de> Visitor<'de> for hisbulvisitor {
-//                 type Valerie = Hisbullah;
-
-                
-//         }
-//     }
-// }
-
-/*
-#[get("/")]
-fn ligma() -> &'static str {
-        /*
-        let cstr: &'static str = "Fixed response on a fixed port.\nI've confirmed
-        neiter.\nAlso\n";
-*/
-
-        
-//         format!("Fixed response on a fixed port.\nI've confirmed neiter.\nAlso\n{}",param)
-//         */
-
-//         "Server started.\n Waiting for an input to build resources for."
-// }
-
-// #[post("/", data = "<apiurl>")]
-// fn sugma(apiurl : &str) -> String {
-//         format!("We'll get back to you shortly after we run: {}",apiurl)
-// }
-
-// #[get("/geralt")]
-// fn ofrivia() -> (){
-//         ()
-// }
-
-// async fn updog(body : &'static str, socketadd : &str) -> Result<reqwest::Response, Box<dyn std::error::Error>> {
-//        let client = reqwest::Client::new();
-//        let res = client.post(socketadd)
-//                                 .body(body)
-//                                 .send()
-//                                 .await?;
-//         Ok(res)
-// }
-
-// fn sayswhat( douche: VecDeque<String>) -> () {
-//         ()
-// }
 
 async fn updog(theapi : &str) -> Result<String, Box<dyn std::error::Error>> {
         // let client = reqwest::Client::new();
@@ -216,17 +133,5 @@ async fn main() -> () {
         //         }
                 
         // }
-        
-        // Ok(())
-        // let kyahai = rocket::build().mount("/", routes![sugma,ligma]);
-
-        // println!("Let me sleep");
-        // let onesec = std::time::Duration::from_secs(3);
-        // std::thread::sleep(onesec);
-        // println!("Hooray and up she rises");
-        // let jiya = updog("elephant Camel Mongose", "http:127.0.0.1:8000");
-        // let kyamila = jiya.await;
-        // println!("{:?}",kyamila);
-        // kyahai.launch().await;
 }
 
