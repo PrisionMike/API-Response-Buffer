@@ -82,7 +82,7 @@ async fn main() -> () {
     let mut extract = false;        // Flag to know if the last 2 arguments (for extracting JSON field) have been provided.
     
     /*
-    Verify the input received.
+    Verify the input received. dbg! is a better alternative now that I know it. Thanks @prophetish1996
     */
     println!(
         // Essential parameters
