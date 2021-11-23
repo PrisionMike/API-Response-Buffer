@@ -1,30 +1,39 @@
 use clap::{App, Arg};
 use reqwest;
-// use rocket::catcher::Result;
-// use rocket::data;
-// use serde::de::{self, Deserializer, MapAccess, SeqAccess, Visitor};
 use serde::Deserialize;
 use serde_json::Value;
 use std::{collections::VecDeque};
 
 #[derive(Deserialize, Debug)]
 struct JsonResponse2 {
+    /*
+    The structure to store any arbitrary Json Response value. This may not be required anymore.
+     */
+
     maal: Value,
 }
 
 async fn updog(theapi: &str) -> Result<String, Box<dyn std::error::Error>> {
-    // let client = reqwest::Client::new();
+    /*
+    The function to return the result of the given API. Simple wrapper around the reqwest, essentially.
+    */
+
     let res = reqwest::get(theapi).await?.text().await?;
-    // println!("What's updog?");
     Ok(res)
 }
 
-// #[launch]
 #[tokio::main]
-// #[rocket::main]
 async fn main() -> () {
-    println!("Shree Ram Jaanki...");
+    println!("Shree Ram Jaanki...");            // Just to make sure the main ran. :P
 
+    /*
+    The CLAP part. CLAP: Command Line Argument Parser.
+    You define what all flags your application can accept, assign each of them a name to be used.
+    Mind you, all input is treated as string, and as it suits the best - &str particularly.
+    Option<&str> to allow for ommission.
+    Read help to know what each would do. CLAP automatically makes the --help functionality too.
+    Drew it out from the Rust cookbook. Great reference.
+    */
     let matches = App::new("JHAADI")
         .version("0.1.0")
         .author("Prison Mike <su.sh2396@gmail.com>")
@@ -61,30 +70,44 @@ async fn main() -> () {
                 .help("Data type of the data in the response"),
         )
         .get_matches();
-
+    
+    /*
+    Assign the respective command line arguments to local variables.
+    */
     let the_api = matches.value_of("theapi").unwrap_or("Jhingalala");
     let cap = matches.value_of("capacity").unwrap_or("hu hu");
     let dataf = matches.value_of("JSON_data_section");
     let datat = matches.value_of("data_type");
-    let mut extract = false;
+
+    let mut extract = false;        // Flag to know if the last 2 arguments (for extracting JSON field) have been provided.
+    
+    /*
+    Verify the input received.
+    */
     println!(
+        // Essential parameters
         "input received:\n
                   API:  {}\n
                   Capacity: {}\n",
-        &the_api, &cap
+        the_api, cap
     );
+
+    /*
+    Optional parameter parsing.
+    */
     if let Some(v) = dataf {
         println!("Data field: {}", v);
         extract = true;
         match datat {
+            /*
+            So far this field has not yet been required in the application.
+            */
             Some(v) => println!("Data type: {}", v),
-            None => panic!(
-                "Provide the type of data using the -t or --datatype flag (int,str,hex,binary)"
-            ),
+            None => (),
         }
     }
 
-    let capint: usize = usize::from_str_radix(cap, 10).unwrap() + 1;
+    let capint: usize = usize::from_str_radix(cap, 10).unwrap() + 1;        // Parsing the capacity as usize integer.
 
     let mut response_tank: VecDeque<String> = VecDeque::with_capacity(capint);
     for _i in 1..capint {
