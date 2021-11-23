@@ -1,4 +1,5 @@
 use clap::{App, Arg};
+use jhaadi::wrap_the_clap;
 use reqwest;
 use serde::Deserialize;
 use serde_json::Value;
@@ -55,122 +56,20 @@ async fn main() -> () {
                 .takes_value(true)
                 .help("Number of Responses to cache"),
         )
-        .arg(
-            Arg::with_name("JSON_data_section")
-                .short("d")
-                .long("data")
-                .takes_value(true)
-                .help("Enter the data field for the expected JSON repsonse."),
-        )
-        .arg(
-            Arg::with_name("data_type")
-                .short("t")
-                .long("datatype")
-                .takes_value(true)
-                .help("Data type of the data in the response"),
-        )
         .get_matches();
     
-    /*
-    Assign the respective command line arguments to local variables.
-    */
-    let the_api = matches.value_of("theapi").unwrap_or("Jhingalala");
-    let cap = matches.value_of("capacity").unwrap_or("hu hu");
-    let dataf = matches.value_of("JSON_data_section");
-    let datat = matches.value_of("data_type");
-
-    let mut extract = false;        // Flag to know if the last 2 arguments (for extracting JSON field) have been provided.
-    
-    /*
-    Verify the input received. dbg! is a better alternative now that I know it. Thanks @prophetish1996
-    */
-    println!(
-        // Essential parameters
-        "input received:\n
-                  API:  {}\n
-                  Capacity: {}\n",
-        the_api, cap
-    );
-
-    /*
-    Optional parameter parsing.
-    */
-    if let Some(v) = dataf {
-        println!("Data field: {}", v);
-        extract = true;
-        match datat {
-            /*
-            So far this field has not yet been required in the application.
-            */
-            Some(v) => println!("Data type: {}", v),
-            None => (),
-        }
-    }
-
-    let capint: usize = usize::from_str_radix(cap, 10).unwrap() + 1;        // Parsing the capacity as usize integer.
+    let (the_api, capint) = wrap_the_clap(&matches);    
 
     let mut response_tank: VecDeque<String> = VecDeque::with_capacity(capint);
     for _i in 1..capint {
-        //block i =0 ,
+        /*
+        The code is blocking rn. What we have to do is to make multiple async calls to the API
+        (kinda like putting in multiple hoses in the tank) to speed up the fetch.
+        That is a great piece of code, yet to be written. Untill then..
+        */
         let res = updog(the_api).await;
         response_tank.push_back(res.unwrap());
         println!()
-
-        // 1 -> wait 1 -> if(tankempty hit next) 
-        // 2 -> wait 2 -> hit 3 
-        // 3 -> wait 3 -> hit 4 
-        // 4
     }
-
-    let mut data_tank: VecDeque<JsonResponse2> = VecDeque::new();
-
-    if extract {
-        for _i in 1..capint {
-            let respi = response_tank.pop_front();
-            match respi {
-                None => {
-                    println!("Tank empty");
-                    break;
-                }
-                Some(v) => {
-                    // dbg!(v.clone());
-                    let val: Value = serde_json::from_str(&v[..]).unwrap();
-                    let malvalue = &val[dataf.unwrap()].to_owned();
-                    data_tank.push_back(JsonResponse2 {
-                        maal: malvalue.to_owned(),
-                    });
-                }
-            }
-        }
-    }
-    while !data_tank.is_empty() {
-        let front_item = data_tank.pop_front();
-        // dbg!(&front_item);
-        // match front_item {
-        //     Some(v) => {
-        //             println!("I {:?}", v);
-        //     }
-        //     None => println!("S"),
-        // };
-        println!("PM {:?}", front_item.unwrap());
-
-    }
-    // let data_tank: VecDeque<>
-
-    // for _i in 1 .. capint {
-    //         let popped =  response_tank.pop_front();
-    //         if let Some(v) = popped {
-    //                 println!("{}",v);
-    //                 response_tank.push_back(v);
-    //         }
-
-    // }
+    dbg!(&response_tank);
 }
-
-// localhost ->  [~(1000), 1]  ->(pop)-> []
-// localhost ->  [2,]  ->(pop)-> [1,]
-
-// 101 LOC 1 Line 1 sec
-// 100x
-// true
-// {"type":"uint8","length":1,"data":[243],"success":true}

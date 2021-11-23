@@ -1,6 +1,16 @@
 ## Sample input:
 ```
-cargo run -- -n 1000 -i "https://qrng.anu.edu.au/API/jsonI.php?length=10&type=uint8"
+cargo run -- -n 3 -i "https://qrng.anu.edu.au/API/jsonI.php?length=10&type=uint8" -d "data" -t "usize"
+```
+## Sample output of the API at hand:
+```
+I => https://qrng.anu.edu.au/API/jsonI.php?length=3&type=uint8
+
+O => {"type":"uint8","length":3,"data":[53,184,52],"success":true}
+
+I => https://qrng.anu.edu.au/API/jsonI.php?length=3&type=hex16&size=6
+
+O => {"type":"string","length":3,"size":6,"data":["2f793a9eed21","dbceb801f33d","859633f81c4a"],"success":true}
 ```
 Having tried *Trait objects* and miserably failing as it required **AT LEAST** manually implementing the `Deserialize` trait to it, and then some.  
 
