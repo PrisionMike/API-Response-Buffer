@@ -2,10 +2,10 @@ use clap::{App, Arg};
 use reqwest;
 // use rocket::catcher::Result;
 // use rocket::data;
-use serde::de::{self, Deserializer, MapAccess, SeqAccess, Visitor};
+// use serde::de::{self, Deserializer, MapAccess, SeqAccess, Visitor};
 use serde::Deserialize;
 use serde_json::Value;
-use std::{collections::VecDeque, fmt};
+use std::{collections::VecDeque};
 
 #[derive(Deserialize, Debug)]
 struct JsonResponse2 {
@@ -88,9 +88,15 @@ async fn main() -> () {
 
     let mut response_tank: VecDeque<String> = VecDeque::with_capacity(capint);
     for _i in 1..capint {
+        //block i =0 ,
         let res = updog(the_api).await;
         response_tank.push_back(res.unwrap());
         println!()
+
+        // 1 -> wait 1 -> if(tankempty hit next) 
+        // 2 -> wait 2 -> hit 3 
+        // 3 -> wait 3 -> hit 4 
+        // 4
     }
 
     let mut data_tank: VecDeque<JsonResponse2> = VecDeque::new();
@@ -104,7 +110,7 @@ async fn main() -> () {
                     break;
                 }
                 Some(v) => {
-                    dbg!(v.clone());
+                    // dbg!(v.clone());
                     let val: Value = serde_json::from_str(&v[..]).unwrap();
                     let malvalue = &val[dataf.unwrap()].to_owned();
                     data_tank.push_back(JsonResponse2 {
@@ -117,12 +123,14 @@ async fn main() -> () {
     while !data_tank.is_empty() {
         let front_item = data_tank.pop_front();
         // dbg!(&front_item);
-        match front_item {
-            Some(v) => {
-                    println!("Ishank {:?}", v);
-            }
-            None => println!("Sharma"),
-        };
+        // match front_item {
+        //     Some(v) => {
+        //             println!("I {:?}", v);
+        //     }
+        //     None => println!("S"),
+        // };
+        println!("PM {:?}", front_item.unwrap());
+
     }
     // let data_tank: VecDeque<>
 
@@ -135,3 +143,11 @@ async fn main() -> () {
 
     // }
 }
+
+// localhost ->  [~(1000), 1]  ->(pop)-> []
+// localhost ->  [2,]  ->(pop)-> [1,]
+
+// 101 LOC 1 Line 1 sec
+// 100x
+// true
+// {"type":"uint8","length":1,"data":[243],"success":true}
