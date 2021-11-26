@@ -1,6 +1,7 @@
 use clap::{App, Arg};
 use jhaadi::*;
 use chrono::prelude::*;
+use std::io;
 
 #[tokio::main]
 async fn main() -> () {
@@ -50,9 +51,20 @@ async fn main() -> () {
     println!("Tank filled at {:?}",gentime);
 
     let listeny_port = "23541";
-    let fulladd = format!("http://localhost:{}/",listeny_port);
+    let fulladd = format!("localhost:{}",listeny_port);
 
     disone.set_addr(&fulladd[..]);
-    dbg!(&disone);
-
+    println!("All set at {}\nWould you like to activate?",disone.get_addr());
+    let mut input = String::new();
+    io::stdin().read_line(&mut input).expect("Error reading from stdin");
+    
+    if input.to_lowercase() == "yes\r\n" {
+        disone.deploy_engaged();
+        println!("Server deployed. You probably can't do anything in this terminal now")
+    } else if input.to_lowercase() == "no\r\n" {
+        println!("Alright!")
+    } else {
+        println!("The answer was supposed to be either yes or no. Fuck off for now.")
+    }
+    dbg!(&input);
 }

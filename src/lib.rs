@@ -1,7 +1,8 @@
 use clap;
-use std::{collections::VecDeque};
+use std::collections::VecDeque;
 use reqwest;
 use chrono::prelude::*;
+use std::net::TcpListener;
 
 #[derive(Debug)]
 pub struct Dispenser {
@@ -46,6 +47,15 @@ impl Dispenser {
 
     pub fn get_addr(&self) -> &str {
        &self.addr[..]
+    }
+
+    pub fn deploy_engaged(&self) {
+      let listener = TcpListener::bind(&self.addr).unwrap();
+      for stream in listener.incoming() {
+         let _stream = stream.unwrap();
+         println!("You're visiting the server for {} API.\n
+                  last cached at: {:?}",self.api,self.so_stale.unwrap());
+      }
     }
 }
 
