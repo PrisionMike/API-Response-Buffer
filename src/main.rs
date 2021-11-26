@@ -66,5 +66,5 @@ async fn main() -> () {
     } else {
         println!("The answer was supposed to be either yes or no. Fuck off for now.")
     }
-    dbg!(&input);
+    
 }

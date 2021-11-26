@@ -63,7 +63,18 @@ impl Dispenser {
       fn handle_them(mut stream: TcpStream) {
          let mut buffer = [0; 1024];
          stream.read(&mut buffer).unwrap();
-         println!("Request: {}",String::from_utf8_lossy(&buffer[..]))
+
+         let req = String::from_utf8_lossy(&buffer[..]);
+         println!("Request: {}",req);
+
+         println!("============ Allow me to answer it ===========");
+
+         let req_words: Vec<&str> = req.split(' ').collect();
+         let command = req_words[0];
+         let num = req_words[1];
+         if command == "GIVE" && &num[0].is_numeric() {
+            println!("Valid response.");
+         }
       }
     }
 }
