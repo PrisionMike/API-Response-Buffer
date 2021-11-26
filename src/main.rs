@@ -1,9 +1,8 @@
 use clap::{App, Arg};
 use jhaadi::wrap_the_clap;
-use reqwest;
+use jhaadi::charge_the_tank;
 use serde::Deserialize;
 use serde_json::Value;
-use std::{collections::VecDeque};
 
 #[derive(Deserialize, Debug)]
 struct JsonResponse2 {
@@ -14,14 +13,7 @@ struct JsonResponse2 {
     maal: Value,
 }
 
-async fn updog(theapi: &str) -> Result<String, Box<dyn std::error::Error>> {
-    /*
-    The function to return the result of the given API. Simple wrapper around the reqwest, essentially.
-    */
 
-    let res = reqwest::get(theapi).await?.text().await?;
-    Ok(res)
-}
 
 #[tokio::main]
 async fn main() -> () {
@@ -60,16 +52,6 @@ async fn main() -> () {
     
     let (the_api, capint) = wrap_the_clap(&matches);    
 
-    let mut response_tank: VecDeque<String> = VecDeque::with_capacity(capint);
-    for _i in 1..capint {
-        /*
-        The code is blocking rn. What we have to do is to make multiple async calls to the API
-        (kinda like putting in multiple hoses in the tank) to speed up the fetch.
-        That is a great piece of code, yet to be written. Untill then..
-        */
-        let res = updog(the_api).await;
-        response_tank.push_back(res.unwrap());
-        println!()
-    }
+    let mut response_tank = charge_the_tank(the_api, capint).await;
     dbg!(&response_tank);
 }
