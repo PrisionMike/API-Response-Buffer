@@ -3,17 +3,7 @@ use jhaadi::wrap_the_clap;
 use jhaadi::charge_the_tank;
 use serde::Deserialize;
 use serde_json::Value;
-
-#[derive(Deserialize, Debug)]
-struct JsonResponse2 {
-    /*
-    The structure to store any arbitrary Json Response value. This may not be required anymore.
-     */
-
-    maal: Value,
-}
-
-
+use chrono::prelude::*;
 
 #[tokio::main]
 async fn main() -> () {
@@ -50,8 +40,15 @@ async fn main() -> () {
         )
         .get_matches();
     
-    let (the_api, capint) = wrap_the_clap(&matches);    
+    let (the_api, capint) = wrap_the_clap(&matches); 
+    
+    println!("Request received for:\nAPI: {}\nCapacity: {}", the_api, capint);
 
     let mut response_tank = charge_the_tank(the_api, capint).await;
-    dbg!(&response_tank);
+
+    let gentime = Local::now();
+    println!("Tank filled at {:?}",gentime);
+
+    let listeny_port = "23541";
+
 }
