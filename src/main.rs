@@ -1,8 +1,5 @@
 use clap::{App, Arg};
-use jhaadi::wrap_the_clap;
-use jhaadi::charge_the_tank;
-use serde::Deserialize;
-use serde_json::Value;
+use jhaadi::*;
 use chrono::prelude::*;
 
 #[tokio::main]
@@ -42,13 +39,17 @@ async fn main() -> () {
     
     let (the_api, capint) = wrap_the_clap(&matches); 
     
-    println!("Request received for:\nAPI: {}\nCapacity: {}", the_api, capint);
+    let mut disone = Dispenser::new(the_api, capint);
 
-    let mut response_tank = charge_the_tank(the_api, capint).await;
+    println!("Request received for:\nAPI: {}\nCapacity: {}", disone.api, disone.capacity);
+
+    // let mut response_tank = charge_the_tank(the_api, capint).await;
+    disone.charge_the_tank().await;
 
     let gentime = Local::now();
     println!("Tank filled at {:?}",gentime);
 
-    let listeny_port = "23541";
+    let _listeny_port = "23541";
+    dbg!(&disone);
 
 }
