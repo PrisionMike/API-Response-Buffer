@@ -39,6 +39,14 @@ impl Dispenser {
 
        self.so_stale = Some(Local::now());
     }
+
+    pub fn set_addr(&mut self, addr: &str) {
+       self.addr = addr.to_owned();
+    }
+
+    pub fn get_addr(&self) -> &str {
+       &self.addr[..]
+    }
 }
 
  pub fn wrap_the_clap<'a> (matches: &'a clap::ArgMatches) -> ( &'a str, usize) {

@@ -49,7 +49,10 @@ async fn main() -> () {
     let gentime = Local::now();
     println!("Tank filled at {:?}",gentime);
 
-    let _listeny_port = "23541";
+    let listeny_port = "23541";
+    let fulladd = format!("http://localhost:{}/",listeny_port);
+
+    disone.set_addr(&fulladd[..]);
     dbg!(&disone);
 
 }
