@@ -1,4 +1,5 @@
 use clap;
+use std::borrow::Borrow;
 use std::collections::VecDeque;
 use reqwest;
 use chrono::prelude::*;
@@ -8,7 +9,7 @@ use std::io::prelude::*;
 
 #[derive(Debug)]
 pub struct Dispenser {
-   pub tank : Option<VecDeque<String>>,
+   pub tank : VecDeque<String>,
    pub api : String,
    pub capacity : usize,
    pub so_stale : Option<DateTime<Local>>,
@@ -17,10 +18,10 @@ pub struct Dispenser {
 impl Dispenser {
    pub fn new( the_api: &str, cap: usize) -> Self {
       Self {
-         tank: None,
+         tank: VecDeque::with_capacity(cap),
          api: the_api.to_owned(),
          capacity:  cap,
-         so_stale:Some(Local::now()),
+         so_stale: Some(Local::now()),
          addr : String::from(""),
       }
    }
@@ -38,7 +39,7 @@ impl Dispenser {
          //   let res_string = res.unwrap();
            response_tank.push_back(res.unwrap());
        }
-       self.tank = Some(response_tank);
+       self.tank = response_tank;
 
        self.so_stale = Some(Local::now());
     }
@@ -51,32 +52,61 @@ impl Dispenser {
        &self.addr[..]
     }
 
-    pub fn deploy_engaged(&self) {
+    pub fn deploy_engaged(&mut self) {
       let listener = TcpListener::bind(&self.addr).unwrap();
       for stream in listener.incoming() {
          let stream = stream.unwrap();
          println!("You're visiting the server for {} API.\n
                   last cached at: {:?}",self.api,self.so_stale.unwrap());
-         handle_them(stream);
-      }
-
-      fn handle_them(mut stream: TcpStream) {
-         let mut buffer = [0; 1024];
-         stream.read(&mut buffer).unwrap();
-
-         let req = String::from_utf8_lossy(&buffer[..]);
-         println!("Request: {}",req);
-
-         println!("============ Allow me to answer it ===========");
-
-         let req_words: Vec<&str> = req.split(' ').collect();
-         let command = req_words[0];
-         let num = req_words[1];
-         if command == "GIVE" && &num[0].is_numeric() {
-            println!("Valid response.");
-         }
+         self.handle_them(stream);
       }
     }
+   fn handle_them(&mut self, mut stream: TcpStream) {
+      let mut buffer = [0; 16];
+      stream.read(&mut buffer).unwrap();
+
+      let req = String::from_utf8_lossy(&buffer[..]);
+      dbg!(&req);
+      for c in req.chars() {
+         println!("The chars: {}",c);
+      }
+      println!("Request: {}",req);
+
+      println!("============ Allow me to answer it ===========");
+
+      let req_words: Vec<&str> = req.split(' ').collect();
+      let command = req_words[0];
+      let nullchar = String::from_utf8_lossy(&[0]);
+      let nullcharborrowed = nullchar.as_ref();
+      let mut rest = req_words[1].split(nullcharborrowed);
+      let num = rest.next().unwrap();
+      let numeric = u8::from_str_radix(num,10).unwrap();
+      dbg!(&req_words);
+      dbg!(&command);
+      dbg!(&num);
+      if command == "GIVE" {
+         println!("Valid response.");
+         
+         for i in 0 .. numeric {
+            println!("{} pop.",&i);
+            let resp = self.tank.pop_front();
+            match resp {
+               Some(v) => {
+                  println!("It was some {}",&v);
+                  stream.flush();
+                  stream.write("<RESPONSE>".as_bytes());
+                  stream.write(v.as_bytes());
+                  stream.write("</RESPONSE>".as_bytes());
+               }
+
+               None => {
+                  println!("It was None.");
+                  stream.write("</RESPONSE>".as_bytes());
+               }
+            }
+         }
+      }
+   }
 }
 
  pub fn wrap_the_clap<'a> (matches: &'a clap::ArgMatches) -> ( &'a str, usize) {
