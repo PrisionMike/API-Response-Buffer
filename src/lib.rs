@@ -79,22 +79,20 @@ impl Dispenser {
     }
 }
 
- pub fn wrap_the_clap<'a> (matches: &'a clap::ArgMatches) -> ( &'a str, usize) {
+ pub fn wrap_the_clap<'a> (matches: &'a clap::ArgMatches) -> ( &'a str ) {
     /*
-    Parse the CL arguments.
+    Parse the CL arguments and return capacity.
     */
-    let the_api = matches.value_of("theapi").unwrap_or("Jhingalala");
-    let cap = matches.value_of("capacity").unwrap_or("hu hu");
-    let capint: usize = usize::from_str_radix(cap, 10).unwrap() + 1;        // Parsing the capacity as usize integer.
-
-    (the_api, capint)
+    matches.value_of("capacity").unwrap_or("10")
+//    capint is not necessary as we can use a string to form API request
+//    let capint: usize = usize::from_str_radix(cap, 10).unwrap() + 1;        // Parsing the capacity as usize integer.
  }
 
- async fn updog(theapi: &str) -> Result<String, Box<dyn std::error::Error>> {
+ async fn updog(cap: &str) -> Result<String, Box<dyn std::error::Error>> {
    /*
    The function to return the result of the given API. Simple wrapper around the reqwest, essentially.
    */
-
-   let res = reqwest::get(theapi).await?.text().await?;
+   let api_call = format!("https://qrng.anu.edu.au/API/jsonI.php?length={cap}&type=uint16&size=12")
+   let res = reqwest::get(api_call).await?.text().await?;
    Ok(res)
 }
