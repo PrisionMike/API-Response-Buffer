@@ -1,7 +1,5 @@
 use clap::{App, Arg};
 use jhaadi::*;
-use chrono::prelude::*;
-use std::io;
 
 #[tokio::main]
 async fn main() -> () {
@@ -38,33 +36,19 @@ async fn main() -> () {
         )
         .get_matches();
     
-    let (the_api, capint) = wrap_the_clap(&matches); 
+    let (the_api, capint) = wrap_the_clap(&matches);
+    println!("Clap wrapped"); 
     
     let mut disone = Dispenser::new(the_api, capint);
+    println!("Disp being built for:\nAPI: {}\nCapacity: {}", disone.api, disone.capacity);
 
-    println!("Request received for:\nAPI: {}\nCapacity: {}", disone.api, disone.capacity);
-
-    // let mut response_tank = charge_the_tank(the_api, capint).await;
     disone.charge_the_tank().await;
-
-    let gentime = Local::now();
-    println!("Tank filled at {:?}",gentime);
+    println!("Tank charged.");
 
     let listeny_port = "23541";
     let fulladd = format!("localhost:{}",listeny_port);
 
     disone.set_addr(&fulladd[..]);
-    println!("All set at {}\nWould you like to activate?",disone.get_addr());
-    let mut input = String::new();
-    io::stdin().read_line(&mut input).expect("Error reading from stdin");
-    
-    if input.to_lowercase() == "yes\r\n" {
-        disone.deploy_engaged();
-        println!("Server deployed. You probably can't do anything in this terminal now")
-    } else if input.to_lowercase() == "no\r\n" {
-        println!("Alright!")
-    } else {
-        println!("The answer was supposed to be either yes or no. Fuck off for now.")
-    }
+    disone.deploy_engaged();
     
 }

@@ -10,9 +10,11 @@ use std::io::prelude::*;
 - VecDeque is the standard way to implement any Que in Rust. It stands fro a Double Ended Queue.
 Here we need to use it as a simple linear single ended queue, thus only push_back() and pop_front().
 
-- chrono is used for date/time stamp operations.
+- chrono: date/time stamp operations.
 
-- reqwest is for making GET requests to the target Web API.
+- reqwest: making GET requests to the target Web API.
+
+- clap: command line argument parsing
 
 */
 
@@ -27,7 +29,6 @@ pub struct Dispenser {
 impl Dispenser {
 
    /*
-   
    Future improvement:
       - Return errors for important functions.
    
@@ -77,11 +78,13 @@ impl Dispenser {
       }
     }
    fn handle_them(&mut self, mut stream: TcpStream) {
+      println!("handle_them starts");
       let mut buffer = [0; 16];
       stream.read(&mut buffer).unwrap();
 
       let req = String::from_utf8_lossy(&buffer[..]);
       println!("Request: {}",req);        // ==> GIVE 5
+      dbg!(&req);
 
       println!("============ Allow me to answer it ===========");
 
@@ -102,7 +105,15 @@ impl Dispenser {
             match resp {
                Some(v) => {
                   println!("It was some {}",&v);
-                  stream.flush().unwrap();
+                  // stream.flush().unwrap();
+                  let mut stream2 = TcpStream::connect("localhost:58745").unwrap();
+
+                  dbg!(&stream2);
+                  stream2.write("<RESPONSE>".as_bytes()).unwrap();
+                  stream2.write(v.as_bytes()).unwrap();
+                  stream2.write("</RESPONSE>".as_bytes()).unwrap();
+
+                  dbg!(&stream);
                   stream.write("<RESPONSE>".as_bytes()).unwrap();
                   stream.write(v.as_bytes()).unwrap();
                   stream.write("</RESPONSE>".as_bytes()).unwrap();
