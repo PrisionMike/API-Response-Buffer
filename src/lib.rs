@@ -81,10 +81,6 @@ impl Dispenser {
       stream.read(&mut buffer).unwrap();
 
       let req = String::from_utf8_lossy(&buffer[..]);
-      dbg!(&req);
-      // for c in req.chars() {
-      //    println!("The chars: {}",&c);
-      // }
       println!("Request: {}",req);        // ==> GIVE 5
 
       println!("============ Allow me to answer it ===========");
