@@ -15,7 +15,7 @@ async fn main() -> () {
     Read help to know what each would do. CLAP automatically makes the --help functionality too.
     Drew it out from the Rust cookbook. Great reference.
     */
-    let matches = App::new("JHAADI")
+    let matches = App::new("jhaadi")
         .version("0.1.0")
         .author("Prison Mike <su.sh2396@gmail.com>")
         .about("API Response Buffer")

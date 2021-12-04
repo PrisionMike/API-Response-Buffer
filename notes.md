@@ -1,6 +1,8 @@
 ## Sample input:
 ```
-cargo run -- -n 3 -i "https://qrng.anu.edu.au/API/jsonI.php?length=10&type=uint8" -d "data" -t "usize"
+cargo run -- -n 10 -i "https://qrng.anu.edu.au/API/jsonI.php?length=10&type=uint8"
+
+cargo run -- -n 10 -i "https://qrng.anu.edu.au/API/jsonI.php?length=10&type=uint8" -d "data" -t "usize"
 ```
 ## Sample output of the API at hand:
 ```
