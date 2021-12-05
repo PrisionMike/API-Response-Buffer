@@ -1,7 +1,10 @@
 //use clap::{App, Arg};
 use structopt::StructOpt;
+use reqwest;
+use tokio;
 use jhaadi::*;
 use chrono::prelude::*;
+use std::collections::HashMap;
 use std::io;
 
 /// API Documentation https://qrng.anu.edu.au/contact/api-documentation/
@@ -15,16 +18,42 @@ struct Args {
     capacity: String,
 }
 
+// async fn get_response(api_call_input: String) -> String {
+//     let res = reqwest::get(api_call).await?.text().await?;
+//     match res {
+//         Ok(res) => res,
+//         Err(err) => panic!(),
+//     }
+// }
+
 
 #[tokio::main]
-async fn main() -> () {
-    println!("App is running...");            // Just to make sure the main ran. :P
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    println!("App is running...");  // Just to make sure the main ran. :P
 
     let arg = Args::from_args();
     println!("{:?}", arg);
     
     let api_call = format!("https://qrng.anu.edu.au/API/jsonI.php?length={}&type=uint16&size=12", arg.capacity);
-    println!("{}", api_call)
+    println!("{}", api_call);
+
+    // let res = get_response(api_call);
+
+    // let res = reqwest::get(api_call).await?.text().await?;
+    // match res {
+    //     Ok(json) => println!("{:?}", json),
+    //     Err(_) => println!("{:?}", Err),
+    // }
+    
+
+    let res = reqwest::get(api_call).await?.json().await?;
+    Ok(println!("res = {:?}", res))
+
+
+    // println!("res = {:?}", res);
+
+
+    // Ok(())
 }
 
 
