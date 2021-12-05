@@ -105,11 +105,12 @@ impl Dispenser {
             match resp {
                Some(v) => {
                   println!("It was some {}",&v);
-                  // stream.flush().unwrap();
+
                   let mut stream2 = TcpStream::connect("localhost:58745").unwrap();
 
+                  // Try with flush next time.
                   dbg!(&stream2);
-                  stream2.write("<RESPONSE>".as_bytes()).unwrap();
+                  dbg!(stream2.write("<RESPONSE>".as_bytes()).unwrap());
                   stream2.write(v.as_bytes()).unwrap();
                   stream2.write("</RESPONSE>".as_bytes()).unwrap();
 
