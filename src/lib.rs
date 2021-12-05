@@ -2,9 +2,7 @@ use clap;
 use std::collections::VecDeque;
 use reqwest;
 use chrono::prelude::*;
-use std::net::TcpListener;
-use std::net::TcpStream;
-use std::io::prelude::*;
+use std::net::SocketAddr;
 
 /*
 - VecDeque is the standard way to implement any Que in Rust. It stands fro a Double Ended Queue.
@@ -24,7 +22,7 @@ pub struct Dispenser {
    pub api : String,
    pub capacity : usize,                              // Maximum number of responses the tank can hold.
    pub so_stale : Option<DateTime<Local>>,            // Time stamp of the last response.
-   pub addr : String,                                 // Server address. Resource address in future methods.
+   pub addr : Option<SocketAddr>,                                 // Server address. Resource address in future methods.
 }
 impl Dispenser {
 
@@ -39,7 +37,7 @@ impl Dispenser {
          api: the_api.to_owned(),
          capacity:  cap,                        
          so_stale: Some(Local::now()),          
-         addr : String::from(""),               
+         addr : None,               
       }
    }
 
@@ -60,12 +58,12 @@ impl Dispenser {
         
     }
 
-    pub fn set_addr(&mut self, addr: &str) {
-       self.addr = addr.to_owned();
+    pub fn set_addr(&mut self, addr: SocketAddr) {
+       self.addr = Some(addr);
     }
 
-    pub fn get_addr(&self) -> &str {
-       &self.addr[..]
+    pub fn get_addr(&self) -> &Option<SocketAddr> {
+       &self.addr
     }
 
     pub fn deploy_engaged(&mut self) {

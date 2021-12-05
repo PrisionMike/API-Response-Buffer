@@ -1,5 +1,6 @@
 use clap::{App, Arg};
 use jhaadi::*;
+use std::net::{IpAddr, Ipv4Addr, SocketAddr};
 
 #[tokio::main]
 async fn main() -> () {
@@ -45,10 +46,10 @@ async fn main() -> () {
     disone.charge_the_tank().await;
     println!("Tank charged.");
 
-    let listeny_port = "23541";
-    let fulladd = format!("localhost:{}",listeny_port);
+    let listeny_port : u16 = 23541;
+    let sockaddr = SocketAddr::new(IpAddr::V4(Ipv4Addr::new(127, 0, 0,  1)), listeny_port);
 
-    disone.set_addr(&fulladd[..]);
+    disone.set_addr(sockaddr);
     disone.deploy_engaged();
     
 }
