@@ -13,6 +13,10 @@ fn main() {
    
 }
 
+/*
+A small code to test the TCP response of the server. Refer equivalent commit in lib.rs to fork this out.
+*/
+
 fn server(localaddr : SocketAddr) {
     println!("yahan tak bhi nahi aye?");
     // let listener2 = TcpListener::bind("localhost:58745").unwrap();

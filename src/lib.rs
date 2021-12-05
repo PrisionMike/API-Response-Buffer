@@ -69,65 +69,9 @@ impl Dispenser {
     }
 
     pub fn deploy_engaged(&mut self) {
-      let listener = TcpListener::bind(&self.addr).unwrap();
-      for stream in listener.incoming() {
-         let stream = stream.unwrap();
-         println!("You're visiting the server for {} API.\n
-                  last cached at: {:?}",self.api,self.so_stale.unwrap());
-         self.handle_them(stream);
-      }
+      
     }
-   fn handle_them(&mut self, mut stream: TcpStream) {
-      println!("handle_them starts");
-      let mut buffer = [0; 16];
-      stream.read(&mut buffer).unwrap();
-
-      let req = String::from_utf8_lossy(&buffer[..]);
-      println!("Request: {}",req);        // ==> GIVE 5
-      dbg!(&req);
-
-      println!("============ Allow me to answer it ===========");
-
-      let req_words: Vec<&str> = req.split(' ').collect();             // [GIVE],[5]
-      let command = req_words[0];                                 // GIVE
-      let nullchar = String::from_utf8_lossy(&[0]);      // The character used to instantiate an empty buffer. 
-      let num = req_words[1].split(nullchar.as_ref()).next().unwrap();    // "5"
-      let numeric = u8::from_str_radix(num,10).unwrap();  // 5
-      dbg!(&req_words);
-      dbg!(&command);
-      dbg!(&num);
-      if command == "GIVE" {
-         println!("Valid response.");
-         
-         for i in 0 .. numeric {
-            println!("{} pop.",&i);
-            let resp = self.tank.pop_front();
-            match resp {
-               Some(v) => {
-                  println!("It was some {}",&v);
-
-                  let mut stream2 = TcpStream::connect("localhost:58745").unwrap();
-
-                  // Try with flush next time.
-                  dbg!(&stream2);
-                  dbg!(stream2.write("<RESPONSE>".as_bytes()).unwrap());
-                  stream2.write(v.as_bytes()).unwrap();
-                  stream2.write("</RESPONSE>".as_bytes()).unwrap();
-
-                  dbg!(&stream);
-                  stream.write("<RESPONSE>".as_bytes()).unwrap();
-                  stream.write(v.as_bytes()).unwrap();
-                  stream.write("</RESPONSE>".as_bytes()).unwrap();
-               }
-
-               None => {
-                  println!("It was None.");
-                  stream.write("</RESPONSE>".as_bytes()).unwrap();
-               }
-            }
-         }
-      }
-   }
+   
 }
 
  pub fn wrap_the_clap<'a> (matches: &'a clap::ArgMatches) -> ( &'a str, usize) {
