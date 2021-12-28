@@ -24,7 +24,7 @@ pub struct Dispenser {
    pub api : String,
    pub capacity : usize,                              // Maximum number of responses the tank can hold.
    pub so_stale : Option<DateTime<Local>>,            // Time stamp of the last response.
-   pub addr : String,                                 // Server address. Resource address in future methods.
+   pub addr : Option<SocketAddr>,                                 // Server address. Resource address in future methods.
 }
 impl Dispenser {
 
@@ -40,7 +40,7 @@ impl Dispenser {
          api: the_api.to_owned(),
          capacity:  cap,                        
          so_stale: Some(Local::now()),          
-         addr : String::from(""),               
+         addr : None,               
       }
    }
 
@@ -62,10 +62,10 @@ impl Dispenser {
     }
 
    pub fn set_addr(&mut self, addr: SocketAddr) {
-       self.addr = format!("{}/{}/",addr,self.name);
+       self.addr = Some(addr);
     }
 
-   pub fn get_addr(&self) -> &str {
+   pub fn get_addr(&self) -> &Option<SocketAddr> {
        &self.addr
     }
    
@@ -91,6 +91,6 @@ async fn updog(theapi: &str) -> Result<String, Box<dyn std::error::Error>> {
    Ok(res)
 }
 
-fn homepage() -> impl Responder {
+pub async fn homepage() -> impl Responder {
    HttpResponse::Ok().body("The dispenser will be with you shortly.")
 }

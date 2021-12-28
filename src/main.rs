@@ -1,10 +1,11 @@
 use clap::{App, Arg};
 use jhaadi::*;
 use std::net::{IpAddr, Ipv4Addr, SocketAddr};
+use actix_web::{web, App as actixapp, HttpServer};
 
 
 #[actix_web::main]
-async fn main() -> () {
+async fn main() -> std::io::Result<()> {
     println!("Shree Ram Jaanki...");            // Just to make sure the main ran. :P
 
     /*
@@ -52,7 +53,7 @@ async fn main() -> () {
     let (the_api, capint) = wrap_the_clap(&matches);
     println!("Clap wrapped"); 
     
-    let naam1 = String::from("d1");
+    let naam1 = String::from("/d1");
     let mut disone = Dispenser::new(naam1, the_api, capint);
     println!("Disp being built for:\nAPI: {}\nCapacity: {}\n naam: {}", disone.api, disone.capacity, disone.name);
 
@@ -63,6 +64,13 @@ async fn main() -> () {
     let sockaddr = SocketAddr::new(IpAddr::V4(Ipv4Addr::new(127, 0, 0,  1)), listeny_port);
 
     disone.set_addr(sockaddr);
-    println!("{}",disone.get_addr());
+    // println!("{}",disone.get_addr());
     
+    HttpServer::new( move || {
+        actixapp::new()
+            .route( &disone.name,web::get().to(homepage))
+    })
+    .bind(&disone.addr.unwrap())?
+    .run()
+    .await
 }
