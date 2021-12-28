@@ -2,7 +2,8 @@ use clap::{App, Arg};
 use jhaadi::*;
 use std::net::{IpAddr, Ipv4Addr, SocketAddr};
 
-#[tokio::main]
+
+#[actix_web::main]
 async fn main() -> () {
     println!("Shree Ram Jaanki...");            // Just to make sure the main ran. :P
 
@@ -35,13 +36,25 @@ async fn main() -> () {
                 .takes_value(true)
                 .help("Number of Responses to cache"),
         )
+        .arg(
+            Arg::with_name("dispenser_name")
+            .short("m")
+            .long("name")
+            .takes_value(true)
+            .help(
+                "Give a title to the dispenser for referencing.
+                This name will be a part of the local API text so chose as per convenience.
+                Maybe put something as small as a number. e.g. \"1\""
+            )
+        )
         .get_matches();
     
     let (the_api, capint) = wrap_the_clap(&matches);
     println!("Clap wrapped"); 
     
-    let mut disone = Dispenser::new(the_api, capint);
-    println!("Disp being built for:\nAPI: {}\nCapacity: {}", disone.api, disone.capacity);
+    let naam1 = String::from("d1");
+    let mut disone = Dispenser::new(naam1, the_api, capint);
+    println!("Disp being built for:\nAPI: {}\nCapacity: {}\n naam: {}", disone.api, disone.capacity, disone.name);
 
     disone.charge_the_tank().await;
     println!("Tank charged.");
@@ -50,6 +63,6 @@ async fn main() -> () {
     let sockaddr = SocketAddr::new(IpAddr::V4(Ipv4Addr::new(127, 0, 0,  1)), listeny_port);
 
     disone.set_addr(sockaddr);
-    disone.deploy_engaged();
+    println!("{}",disone.get_addr());
     
 }

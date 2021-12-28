@@ -1,8 +1,7 @@
 ## Sample input:
 ```
-cargo run -- -n 10 -i "https://qrng.anu.edu.au/API/jsonI.php?length=10&type=uint8"
+cargo run -- -n 10 -i "https://qrng.anu.edu.au/API/jsonI.php?length=1&type=uint8"
 
-cargo run -- -n 10 -i "https://qrng.anu.edu.au/API/jsonI.php?length=10&type=uint8" -d "data" -t "usize"
 ```
 ## Sample output of the API at hand:
 ```
@@ -21,3 +20,9 @@ The process seems surprisingly complicated. It's a simple case of not knowing wh
 It seems you cannot even implement the `Deserialize` Trait for a Trait object (yet?). So I gotta figure out how to do it using generics only. Not Trait Bound.
 
 - Refactoring first, Reassigning scope later - (@PrisonMike, 23/11)
+
+```
+Actix allows for services and routes to be added. They are the same thing only services uses neat macros like *rocket.rs* did.
+I'll be using routes here as the name will be passed by the main program or preferrably by the user. Thus the compiler may need to know it.
+That's a speculation. I have not tried contradicting it.
+```
