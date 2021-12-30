@@ -3,7 +3,8 @@ use std::collections::VecDeque;
 use reqwest;
 use chrono::prelude::*;
 use std::net::SocketAddr;
-use actix_web::{Responder,HttpResponse};
+use actix_web::{Responder,HttpResponse, HttpRequest, web};
+use serde::Deserialize;
 
 /*
 - VecDeque is the standard way to implement any Que in Rust. It stands fro a Double Ended Queue.
@@ -93,4 +94,19 @@ async fn updog(theapi: &str) -> Result<String, Box<dyn std::error::Error>> {
 
 pub async fn homepage() -> impl Responder {
    HttpResponse::Ok().body("The dispenser will be with you shortly.")
+}
+
+#[derive(Debug, Deserialize)]
+pub struct Params {
+   n : u32,
+   flag: Option<bool>
+}
+
+pub async fn testurlflag( web::Query(params): web::Query<Params>) -> impl Responder {
+   // let params = web::Query::<Params>::from_query(req.query_string()).unwrap();
+   let flag = match params.flag {
+      Some(v) => format!("{}",v),
+      None => "None".to_owned()
+   };
+   HttpResponse::Ok().body(format!("{}, {}", params.n, flag))
 }

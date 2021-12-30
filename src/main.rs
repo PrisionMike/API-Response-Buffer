@@ -1,7 +1,7 @@
 use clap::{App, Arg};
 use jhaadi::*;
 use std::net::{IpAddr, Ipv4Addr, SocketAddr};
-use actix_web::{web, App as actixapp, HttpServer};
+use actix_web::{web, App as Actixapp, HttpServer};
 
 
 #[actix_web::main]
@@ -67,8 +67,9 @@ async fn main() -> std::io::Result<()> {
     // println!("{}",disone.get_addr());
     
     HttpServer::new( move || {
-        actixapp::new()
-            .route( &disone.name,web::get().to(homepage))
+        Actixapp::new()
+            // .route( &disone.name, web::get().to(homepage))
+            .route( &disone.name, web::get().to(testurlflag))
     })
     .bind(&disone.addr.unwrap())?
     .run()
