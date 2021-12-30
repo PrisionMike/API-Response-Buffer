@@ -3,7 +3,7 @@ use std::collections::VecDeque;
 use reqwest;
 use chrono::prelude::*;
 use std::net::SocketAddr;
-use actix_web::{Responder,HttpResponse, HttpRequest, web};
+use actix_web::{Responder,HttpResponse, HttpRequest, web, get};
 use serde::Deserialize;
 
 /*
@@ -92,6 +92,7 @@ async fn updog(theapi: &str) -> Result<String, Box<dyn std::error::Error>> {
    Ok(res)
 }
 
+#[get("/")]
 pub async fn homepage() -> impl Responder {
    HttpResponse::Ok().body("The dispenser will be with you shortly.")
 }
@@ -102,11 +103,16 @@ pub struct Params {
    flag: Option<bool>
 }
 
+#[get("/")]
 pub async fn testurlflag( web::Query(params): web::Query<Params>) -> impl Responder {
-   // let params = web::Query::<Params>::from_query(req.query_string()).unwrap();
    let flag = match params.flag {
       Some(v) => format!("{}",v),
       None => "None".to_owned()
    };
    HttpResponse::Ok().body(format!("{}, {}", params.n, flag))
+}
+
+#[get("/level")]
+pub async fn level_check() -> impl Responder {
+   format!("", )
 }

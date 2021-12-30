@@ -2,17 +2,17 @@
 
 
 ```
-127.0.0.1:23541/d1 ❌
+127.0.0.1:23541/ ✔️
 
-127.0.0.1:23541/d1?n=4&flag=true // flag = true sent only to check parsing. Won't be in use likely. 🔛
+127.0.0.1:23541/?n=4&flag=true  ✔️
 
-127.0.0.1:23541/d1/stalecheck
+127.0.0.1:23541/stalecheck
 
-127.0.0.1:23541/d1/levelcheck
+127.0.0.1:23541/levelcheck
 
-127.0.0.1:23541/d1/refill
+127.0.0.1:23541/refill
 
-127.0.0.1:23541/d1/refill?x=2 // x = number of workers/threads/hoses to fill the tank
+127.0.0.1:23541/refill?x=2 // x = number of workers/threads/hoses to fill the tank
 
 
 ```

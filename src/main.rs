@@ -68,8 +68,9 @@ async fn main() -> std::io::Result<()> {
     
     HttpServer::new( move || {
         Actixapp::new()
-            // .route( &disone.name, web::get().to(homepage))
-            .route( &disone.name, web::get().to(testurlflag))
+            .service( testurlflag )
+            .service(homepage )
+            // .service( testurlflag )
     })
     .bind(&disone.addr.unwrap())?
     .run()
