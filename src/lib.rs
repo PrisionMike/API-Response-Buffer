@@ -3,7 +3,7 @@ use std::collections::VecDeque;
 use reqwest;
 use chrono::prelude::*;
 use std::net::SocketAddr;
-use actix_web::{Responder,HttpResponse, HttpRequest, web, get};
+use actix_web::{Responder,HttpResponse, web, get};
 use serde::Deserialize;
 
 /*
@@ -92,8 +92,11 @@ async fn updog(theapi: &str) -> Result<String, Box<dyn std::error::Error>> {
    Ok(res)
 }
 
-#[get("/")]
+#[get("/home")]
 pub async fn homepage() -> impl Responder {
+   /*
+   Help/ Full summary of the dispenser.
+   */
    HttpResponse::Ok().body("The dispenser will be with you shortly.")
 }
 
@@ -112,7 +115,26 @@ pub async fn testurlflag( web::Query(params): web::Query<Params>) -> impl Respon
    HttpResponse::Ok().body(format!("{}, {}", params.n, flag))
 }
 
-#[get("/level")]
+#[get("/sohigh")]
 pub async fn level_check() -> impl Responder {
-   format!("", )
+   let sexy = 69;
+   format!("lev: {}", sexy )
+}
+
+#[get("/sofresh")]
+pub async fn stale_check() -> impl Responder {
+   let cdt = Local::now();
+   format!("last sucked at: {}", cdt )
+}
+
+#[derive(Deserialize)]
+pub struct Worker{ x: Option<u8>}
+
+#[get("/refill")]
+pub async fn refill(web::Query(workers): web::Query<Worker>) -> HttpResponse {
+   let comeback = match workers.x {
+      Some(v) => format!("Gonna fill you with {} hoses homie!",&v),
+      None => format!("Let me plug you")
+   };
+   HttpResponse::Ok().body(comeback)
 }

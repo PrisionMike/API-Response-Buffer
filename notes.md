@@ -2,24 +2,24 @@
 
 
 ```
-127.0.0.1:23541/ ✔️
+127.0.0.1:23541/home ✔️
 
 127.0.0.1:23541/?n=4&flag=true  ✔️
 
-127.0.0.1:23541/stalecheck
+127.0.0.1:23541/sofresh ✔️
 
-127.0.0.1:23541/levelcheck
+127.0.0.1:23541/sohigh ✔️
 
-127.0.0.1:23541/refill
+127.0.0.1:23541/refill ✔️
 
-127.0.0.1:23541/refill?x=2 // x = number of workers/threads/hoses to fill the tank
+127.0.0.1:23541/refill?x=2 // x = number of workers/threads/hoses to fill the tank ✔️
 
 
 ```
 
 ## Sample input:
 ```
-cargo run -- -n 10 -i "https://qrng.anu.edu.au/API/jsonI.php?length=1&type=uint8"
+cargo run -- -n 5 -i "https://qrng.anu.edu.au/API/jsonI.php?length=1&type=uint8"
 
 ```
 ## Sample output of the API at hand:
