@@ -140,16 +140,16 @@ pub async fn refill(web::Query(workers): web::Query<Worker>) -> HttpResponse {
    HttpResponse::Ok().body(comeback)
 }
 
-pub struct LetsLockit {
-   dispenser: Mutex<Dispenser>
-}
+// pub struct _LetsLockit {
+//    dispenser: Mutex<Dispenser>
+// }
 
-pub async fn primaryquery(data: web::Data<LetsLockit>, web::Query(params): web::Query<Params>) -> impl Responder {
+pub async fn primaryquery(data: web::Data<Mutex<Dispenser>>, web::Query(params): web::Query<Params>) -> impl Responder {
    let flag = match params.flag {
       Some(_) => ",",
       None => "\n"
    };
-   let mut dispenser = data.dispenser.lock().unwrap();
+   let mut dispenser = data.lock().unwrap();
    let mut resp = String::new();
    let mut breakeh = false;
    for _i in 1 .. params.n {
