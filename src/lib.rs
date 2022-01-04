@@ -104,12 +104,13 @@ pub async fn homepage() -> impl Responder {
 #[derive(Debug, Deserialize)]
 pub struct Params {
    n : u32,
-   flag: Option<bool>
+   sep: Option<String>,     // Separator character. Default: \n
+   endwith: Option<String>  // Final response if the tank is empty.
 }
 
 #[get("/")]
 pub async fn testurlflag( web::Query(params): web::Query<Params>) -> impl Responder {
-   let flag = match params.flag {
+   let flag = match params.sep {
       Some(v) => format!("{}",v),
       None => "None".to_owned()
    };
@@ -140,26 +141,26 @@ pub async fn refill(web::Query(workers): web::Query<Worker>) -> HttpResponse {
    HttpResponse::Ok().body(comeback)
 }
 
-// pub struct _LetsLockit {
-//    dispenser: Mutex<Dispenser>
-// }
-
 pub async fn primaryquery(data: web::Data<Mutex<Dispenser>>, web::Query(params): web::Query<Params>) -> impl Responder {
-   let flag = match params.flag {
-      Some(_) => ",",
-      None => "\n"
+   let sep = match params.sep {
+      Some(v) => v,
+      None => "\n".to_owned()
+   };
+   let endwith = match params.endwith {
+      Some(v) => v,
+      None => "NONE".to_owned()
    };
    let mut dispenser = data.lock().unwrap();
    let mut resp = String::new();
    let mut breakeh = false;
-   for _i in 1 .. params.n {
+   for _i in 0 .. params.n {
       let topush = match dispenser.tank.pop_front() {
          Some(v) => v,
          None => { breakeh = true;
-                   "NONE".to_owned() }
+                   endwith.clone() }
       };
       resp.push_str(&topush[..]);
-      resp.push_str(flag);
+      resp.push_str(&sep[..]);
 
       if breakeh {
          break;
