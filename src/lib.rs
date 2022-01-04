@@ -5,6 +5,7 @@ use chrono::prelude::*;
 use std::net::SocketAddr;
 use actix_web::{Responder,HttpResponse, web, get};
 use serde::Deserialize;
+use std::sync::Mutex;
 
 /*
 - VecDeque is the standard way to implement any Que in Rust. It stands fro a Double Ended Queue.
@@ -18,7 +19,7 @@ Here we need to use it as a simple linear single ended queue, thus only push_bac
 
 */
 
-#[derive(Debug)]
+#[derive(Debug,Clone)]
 pub struct Dispenser {
    pub name : String,
    pub tank : VecDeque<String>,
@@ -137,4 +138,32 @@ pub async fn refill(web::Query(workers): web::Query<Worker>) -> HttpResponse {
       None => format!("Let me plug you")
    };
    HttpResponse::Ok().body(comeback)
+}
+
+pub struct LetsLockit {
+   dispenser: Mutex<Dispenser>
+}
+
+pub async fn primaryquery(data: web::Data<LetsLockit>, web::Query(params): web::Query<Params>) -> impl Responder {
+   let flag = match params.flag {
+      Some(_) => ",",
+      None => "\n"
+   };
+   let mut dispenser = data.dispenser.lock().unwrap();
+   let mut resp = String::new();
+   let mut breakeh = false;
+   for _i in 1 .. params.n {
+      let topush = match dispenser.tank.pop_front() {
+         Some(v) => v,
+         None => { breakeh = true;
+                   "NONE".to_owned() }
+      };
+      resp.push_str(&topush[..]);
+      resp.push_str(flag);
+
+      if breakeh {
+         break;
+      }
+   }
+   HttpResponse::Ok().body(resp)
 }

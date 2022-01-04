@@ -1,7 +1,7 @@
 use clap::{App, Arg};
 use jhaadi::*;
 use std::net::{IpAddr, Ipv4Addr, SocketAddr};
-use actix_web::{ App as Actixapp, HttpServer};
+use actix_web::{ App as Actixapp, HttpServer, web};
 
 
 #[actix_web::main]
@@ -65,16 +65,18 @@ async fn main() -> std::io::Result<()> {
 
     disone.set_addr(sockaddr);
     // println!("{}",disone.get_addr());
-    
+    let servaddr = &disone.addr.unwrap();
     HttpServer::new( move || {
         Actixapp::new()
-            .service( testurlflag )
+            // .service( testurlflag )
             .service( homepage )
             .service( level_check )
             .service( stale_check )
             .service( refill)
+            .app_data(disone.clone())
+            .route("/", web::get().to(primaryquery))
     })
-    .bind(&disone.addr.unwrap())?
+    .bind(servaddr)?
     .run()
     .await
 }
