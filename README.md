@@ -26,7 +26,7 @@ The whole "Supply System" will be a portable WASM module. It will have _imports_
 
 ## Roadmap.
 
-I don't know how SW versioning works
+I don't know how SW versioning works. Also, I want to plugin `tokio` somewhere in here but I can't even imagine where it will lie in my project.
 
 - **v0.1.0** A command line binary that can work as a tank of API responses.
 
@@ -36,4 +36,18 @@ I don't know how SW versioning works
 
 - Security updates.
 
+- Privacy updates.
+
+- Install Purifiers. (Post process)
+
+- (Make the code Async)?
+
 - Multi API support.
+
+- Multi threading for faster fetching.
+
+- Multi User support.
+
+## Miscellaneous
+
+- _GWS_ stands for _Ganga Water Supply_. The water supply system at my home.
