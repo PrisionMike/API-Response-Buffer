@@ -1,3 +1,5 @@
+#![allow(unused_variables)]
+
 use clap::Parser;
 use gws::*;
 // use std::io;
@@ -12,9 +14,13 @@ struct Args {
     #[clap(short, long, value_parser)]
     api: String,
     #[clap(short, long, value_parser)]
-    number: u32,
+    number: usize,
 }
 
 fn main() {
     let args = Args::parse();
+
+    let dispenser = Dispenser::new(args.api, args.number);
+
+    dbg!(dispenser)
 }

@@ -30,6 +30,12 @@ I don't know how SW versioning works. Also, I want to plugin `tokio` somewhere i
 
 - **v0.1.0** A command line binary that can work as a tank of API responses.
 
+  - A `Dispenser` is created with a given web API and capacity. It has a tank in which it loads the said number of responses in it.
+
+- Make sure the dispenser is ready, about as soon as the user instantiates it. i.e. The user can use an incompletely filled tank.
+
+- Error Handling. Testing? Fuzzing?
+
 - Burn it as a WASM module.
 
 - Make it ready for remote system deployment. (Do the Docs)
