@@ -50,4 +50,7 @@ impl Dispenser {
             None => _EMPTY_TANK_WARNING.to_owned(),
         }
     }
+    pub async fn refill(&mut self) {
+        self.fill_the_tank().await;
+    }
 }
