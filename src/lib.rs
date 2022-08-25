@@ -5,6 +5,7 @@ use reqwest;
 use std::collections::VecDeque;
 
 const _TEST_API_STRING: &str = "https://qrng.anu.edu.au/API/jsonI.php?length=10&type=hex16&size=2";
+const _EMPTY_TANK_WARNING: &str = "!EMPTY_TANK";
 
 #[derive(Debug)]
 pub struct Dispenser {
@@ -42,5 +43,11 @@ impl Dispenser {
         dispenser.fill_the_tank().await.unwrap();
 
         dispenser
+    }
+    pub fn spit(&mut self) -> String {
+        match self.tank.pop_front() {
+            Some(v) => v,
+            None => _EMPTY_TANK_WARNING.to_owned(),
+        }
     }
 }

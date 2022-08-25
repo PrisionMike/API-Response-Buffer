@@ -22,7 +22,9 @@ struct Args {
 async fn main() {
     let args = Args::parse();
 
-    let dispenser = Dispenser::new(args.api, args.number).await;
+    let mut dispenser = Dispenser::new(args.api, args.number).await;
 
-    dbg!(dispenser);
+    println!("Tank created!");
+
+    println!("{}", dispenser.spit());
 }

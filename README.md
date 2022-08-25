@@ -30,11 +30,17 @@ I don't know how SW versioning works. Also, I want to plugin `tokio` somewhere i
 
 - **v0.1.0** A command line binary that can work as a tank of API responses.
 
-  - A `Dispenser` is created with a given web API and capacity. It has a tank in which it loads the said number of responses in it.
+  - ~~A `Dispenser` is created with a given web API and capacity. It has a tank in which it loads the said number of responses in it.~~
+  - ~~It has a _tap_ to dispense the stored cache.~~
+  - It has a _button_ which can be pressed to refill the tank.
+  - Encapsulate the responses for better UX.
+  - Make sure the water comes in the tank. There are no error bubbles in the supply. (Errors due to timeout are handled.)
+  - Switch to _auto-refill_ the tank after a certain time.
+  - _Auto-refill_ now works based on the level of the water in the tank.
 
 - Make the async await flow sensible.
 
-- Handle the timeout scenario (Now available in the `TEST_API = "https://qrng.anu.edu.au/API/"`)
+- Avoid the motor to burnout if there's no supply.
 
 - Error Handling. Testing? Fuzzing?
 
@@ -61,6 +67,8 @@ I don't know how SW versioning works. Also, I want to plugin `tokio` somewhere i
 .
 
 - You specify a full schema of all APIs you want to cache. How many fetchers for it, how many users for it, what errors it can throw, what to do in such errors. Purifier functions, and what not. All of this, written in an in-house schema, or in a standard json/yaml/xml file. The user makes that file. The module will receive a single input - that file - and handle it all.
+
+(Perhaps an encoding scheme to define all this instead of a structured text)
 
 ## Miscellaneous
 
