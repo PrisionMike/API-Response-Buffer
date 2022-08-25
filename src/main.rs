@@ -13,14 +13,16 @@ struct Args {
     /// Web API string.
     #[clap(short, long, value_parser)]
     api: String,
+    /// Number of response you want to cache (Also the total capacity of the tank, for now)
     #[clap(short, long, value_parser)]
     number: usize,
 }
 
-fn main() {
+#[tokio::main]
+async fn main() {
     let args = Args::parse();
 
-    let dispenser = Dispenser::new(args.api, args.number);
+    let dispenser = Dispenser::new(args.api, args.number).await;
 
-    dbg!(dispenser)
+    dbg!(dispenser);
 }

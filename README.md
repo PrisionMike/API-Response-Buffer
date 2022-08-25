@@ -32,7 +32,9 @@ I don't know how SW versioning works. Also, I want to plugin `tokio` somewhere i
 
   - A `Dispenser` is created with a given web API and capacity. It has a tank in which it loads the said number of responses in it.
 
-- Make sure the dispenser is ready, about as soon as the user instantiates it. i.e. The user can use an incompletely filled tank.
+- Make the async await flow sensible.
+
+- Handle the timeout scenario (Now available in the `TEST_API = "https://qrng.anu.edu.au/API/"`)
 
 - Error Handling. Testing? Fuzzing?
 
@@ -53,6 +55,12 @@ I don't know how SW versioning works. Also, I want to plugin `tokio` somewhere i
 - Multi threading for faster fetching.
 
 - Multi User support.
+
+.
+.
+.
+
+- You specify a full schema of all APIs you want to cache. How many fetchers for it, how many users for it, what errors it can throw, what to do in such errors. Purifier functions, and what not. All of this, written in an in-house schema, or in a standard json/yaml/xml file. The user makes that file. The module will receive a single input - that file - and handle it all.
 
 ## Miscellaneous
 

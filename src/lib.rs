@@ -4,7 +4,9 @@
 use reqwest;
 use std::collections::VecDeque;
 
-const TEST_API_STRING: &str = "https://qrng.anu.edu.au/API/jsonI.php?length=10&type=hex16&size=2";
+const _TEST_API_STRING: &str = "https://qrng.anu.edu.au/API/jsonI.php?length=10&type=hex16&size=2";
+
+#[derive(Debug)]
 pub struct Dispenser {
     webapi: String,
     capacity: usize,
@@ -15,7 +17,7 @@ impl Dispenser {
         let client = reqwest::Client::new();
 
         for _ in 1..self.capacity {
-            let res = client.get(TEST_API_STRING).send().await;
+            let res = client.get(&self.webapi[..]).send().await;
             let res_text = match res {
                 Ok(v) => match v.text().await {
                     Ok(u) => u,
@@ -30,14 +32,14 @@ impl Dispenser {
         Ok(())
     }
 
-    pub fn new(webapi: String, capacity: usize) -> Dispenser {
+    pub async fn new(webapi: String, capacity: usize) -> Dispenser {
         let mut dispenser = Dispenser {
             webapi,
             capacity,
             tank: VecDeque::with_capacity(capacity),
         };
 
-        // match dispenser.fill_the_tank().await
+        dispenser.fill_the_tank().await.unwrap();
 
         dispenser
     }
