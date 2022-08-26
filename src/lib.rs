@@ -12,7 +12,7 @@ const _TEST_CAPACITY: usize = 3;
 pub struct Dispenser {
     webapi: String,
     capacity: usize,
-    tank: VecDeque<String>,
+    tank: VecDeque<Water>,
 }
 impl Dispenser {
 
@@ -33,15 +33,15 @@ impl Dispenser {
 
         for _ in 0 .. thismuch {
             let res = client.get(&self.webapi[..]).send().await;
-            let res_text = match res {
+            let res_output: Water = match res {
                 Ok(v) => match v.text().await {
-                    Ok(u) => u,
-                    Err(e) => e.to_string(),
+                    Ok(u) => Water::Good(u),
+                    Err(e) => Water::BadResponseToTextError(e.to_string()),
                 },
-                Err(e) => e.to_string(),
+                Err(e) => Water::BadReqwestError(e.to_string()),
             };
 
-            self.tank.push_back(res_text);
+            self.tank.push_back(res_output);
         }
 
         Ok(())
@@ -69,6 +69,21 @@ impl Dispenser {
     fn level_check(&self) -> usize {
         self.tank.len()
     }
+}
+
+/// The reason I am not going for Option<> as entries and instead having
+/// a specialized struct is to embrace any API response errors as nicely
+/// as expected API responses.
+/// /// Type of entry.
+/// 0 => Null value
+/// 1 => Good API Response.
+/// 2 => Bad API Response.
+enum Water{
+    AIR,
+    Good(String),
+    BadReqwestError(String),
+    BadResponseToTextError(String),
+    BadUnknown(String)
 }
 
 #[cfg(test)]
