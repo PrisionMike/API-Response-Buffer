@@ -2,7 +2,7 @@
 // #![allow(unused_imports)]
 
 use reqwest;
-use std::collections::VecDeque;
+use std::{collections::VecDeque};
 
 const _TEST_API_STRING: &str = "https://qrng.anu.edu.au/API/jsonI.php?length=10&type=hex16&size=2";
 const _EMPTY_TANK_WARNING: &str = "!EMPTY_TANK";
@@ -35,10 +35,10 @@ impl Dispenser {
             let res = client.get(&self.webapi[..]).send().await;
             let res_output: Water = match res {
                 Ok(v) => match v.text().await {
-                    Ok(u) => Water::Good(u),
-                    Err(e) => Water::BadResponseToTextError(e.to_string()),
+                    Ok(u) => Water{ salt: Colour::Clear, data: u},
+                    Err(e) => Water{ salt: Colour::ResponseToTextError, data: e.to_string()},
                 },
-                Err(e) => Water::BadReqwestError(e.to_string()),
+                Err(e) => Water{ salt: Colour::ReqwestError, data: e.to_string()},
             };
 
             self.tank.push_back(res_output);
@@ -47,10 +47,10 @@ impl Dispenser {
         Ok(())
     }
 
-    pub fn spit(&mut self) -> String {
+    pub fn spit(&mut self) -> Water {
         match self.tank.pop_front() {
             Some(v) => v,
-            None => _EMPTY_TANK_WARNING.to_owned(),
+            None => Water::air(),
         }
     }
     pub async fn refill_or_prune(&mut self) {
@@ -73,18 +73,58 @@ impl Dispenser {
 
 /// The reason I am not going for Option<> as entries and instead having
 /// a specialized struct is to embrace any API response errors as nicely
-/// as expected API responses.
-/// /// Type of entry.
-/// 0 => Null value
-/// 1 => Good API Response.
-/// 2 => Bad API Response.
-enum Water{
-    AIR,
-    Good(String),
-    BadReqwestError(String),
-    BadResponseToTextError(String),
-    BadUnknown(String)
+/// as expected API responses. But the bigger and better reason is
+/// any `pop` call from a Dequeue is automatically wrapped in an Option<T>.
+/// Thus wrapping the entries themselves would be a double unwrap. Ugly.
+/// Note the order of the values for the
+/// `colour` function.
+#[derive(Debug)]
+pub struct Water {
+    /// Response Type
+    salt: Colour,
+    /// API Response or error string
+    data: String,
 }
+impl Water {
+    /// This function will likely consume the enum instance. Thus the name.
+    pub fn condense(self) -> String {
+        self.data
+    }
+    /// Type of the response.
+    pub fn colour(&self) -> usize {
+        self.salt as usize
+    }
+    /// Ersatz `None` object.
+    pub fn air() -> Self {
+        Water { salt: Colour::Air, data: String::new() }
+    }
+    pub fn is_air(&self) -> bool {
+        match self.salt {
+            Colour::Air => true,
+            _ => false
+        }
+    }
+    pub fn is_water(&self) -> bool {
+        !self.is_air()
+    }
+}
+
+
+#[derive(Debug,Clone,Copy)]
+enum Colour {
+    Air,
+    Clear,
+    ReqwestError,
+    ResponseToTextError,
+    _Unknown
+}
+// impl Deref for Colour {
+//     type Target = usize;
+//     fn deref(&self) -> &Self::Target {
+//         self as &usize
+//     }
+// }
+
 
 #[cfg(test)]
 mod tests {
@@ -106,7 +146,7 @@ mod tests {
         assert_eq!(toti.level_check(), _TEST_CAPACITY);
         assert_eq!(_TEST_CAPACITY, toti.capacity);
         assert_eq!(_TEST_API_STRING,toti.webapi);
-        assert!(!toti.spit().is_empty())
+        assert!(!toti.spit().is_air())
     }
 
 }
