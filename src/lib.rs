@@ -1,12 +1,12 @@
 // #![allow(dead_code)]
 // #![allow(unused_imports)]
 
-use reqwest;
+use reqwest::{self, StatusCode};
 use std::{collections::VecDeque};
 
-const _TEST_API_STRING: &str = "https://qrng.anu.edu.au/API/jsonI.php?length=10&type=hex16&size=2";
-const _EMPTY_TANK_WARNING: &str = "!EMPTY_TANK";
-const _TEST_CAPACITY: usize = 3;
+pub const _TEST_API_STRING: &str = "https://qrng.anu.edu.au/API/jsonI.php?length=10&type=hex16&size=2";
+pub const _EMPTY_TANK_WARNING: &str = "!EMPTY_TANK";
+pub const _TEST_CAPACITY: usize = 3;
 
 #[derive(Debug)]
 pub struct Dispenser {
@@ -23,22 +23,55 @@ impl Dispenser {
             tank: VecDeque::with_capacity(capacity),
         };
 
-        dispenser.fill_the_tank(capacity).await.unwrap();
+        dispenser.hose_the_tank(capacity).await.unwrap();
 
         dispenser
     }
 
-    async fn fill_the_tank(&mut self, thismuch: usize) -> Result<(), reqwest::Error> {
+    /// Fills the tank regardless of the Water quality.
+    async fn hose_the_tank(&mut self, thismuch: usize) -> Result<(), reqwest::Error> {
+        
         let client = reqwest::Client::new();
 
         for _ in 0 .. thismuch {
             let res = client.get(&self.webapi[..]).send().await;
             let res_output: Water = match res {
-                Ok(v) => match v.text().await {
-                    Ok(u) => Water{ salt: Colour::Clear, data: u},
-                    Err(e) => Water{ salt: Colour::ResponseToTextError, data: e.to_string()},
+                
+                Ok(v) => {
+                    let response_status = v.status();
+                    match v.text().await {
+                        Ok(u) => {
+
+                            match response_status {
+                                reqwest::StatusCode::OK => Water { salt: Colour::Clear, data: u, response_code: None },
+                                _ => Water { salt: Colour::ErrorNotOK, data: u, response_code: None }
+                            }
+
+                        }
+                        Err(e) => Water{ salt: Colour::ResponseToTextError, data: e.to_string(), response_code: None},
+                    }
                 },
-                Err(e) => Water{ salt: Colour::ReqwestError, data: e.to_string()},
+                Err(e) => Water{ salt: Colour::ReqwestError, data: e.to_string(), response_code: None},
+            };
+
+            self.tank.push_back(res_output);
+        }
+
+        Ok(())
+    }
+
+    /// Fills the tank to the assurance that all water in it is clean. i.e. All good responses.
+    async fn fill_the_tank(&mut self, thismuch: usize) -> Result<(), reqwest::Error> {
+        
+        let client = reqwest::Client::new();
+
+        for _ in 0 .. thismuch {
+            let res = client.get(&self.webapi[..]).send().await.unwrap();
+            match res.status() {
+                StatusCode::OK => {
+                    
+                },
+                _ => panic!("Raula Pai gaya! ***{}***", res.status())
             };
 
             self.tank.push_back(res_output);
@@ -57,7 +90,7 @@ impl Dispenser {
         
         if self.level_check() < self.capacity {
             let diff = self.capacity - self.level_check();
-            self.fill_the_tank(diff).await.unwrap();
+            self.hose_the_tank(diff).await.unwrap();
         } else if self.level_check() > self.capacity {
             let diff = self.level_check() - self.capacity;
             for _ in 0 .. diff {
@@ -84,19 +117,30 @@ pub struct Water {
     salt: Colour,
     /// API Response or error string
     data: String,
+    response_code: Option<reqwest::StatusCode>
 }
 impl Water {
     /// This function will likely consume the enum instance. Thus the name.
     pub fn condense(self) -> String {
         self.data
     }
-    /// Type of the response.
-    pub fn colour(&self) -> usize {
+    /// Type of the response. 0 means all good.
+    pub fn colour_code(&self) -> usize {
         self.salt as usize
     }
+
+    /// Type of response with acutal colour name.
+    pub fn colour(&self) -> Colour {
+        self.salt
+    }
+    
+    pub fn status_code(&self) -> Option<reqwest::StatusCode> {
+        self.response_code
+    }
+
     /// Ersatz `None` object.
     pub fn air() -> Self {
-        Water { salt: Colour::Air, data: String::new() }
+        Water { salt: Colour::Air, data: String::new(), response_code: None }
     }
     pub fn is_air(&self) -> bool {
         match self.salt {
@@ -111,27 +155,21 @@ impl Water {
 
 
 #[derive(Debug,Clone,Copy)]
-enum Colour {
+pub enum Colour {
     Air,
     Clear,
     ReqwestError,
     ResponseToTextError,
+    ErrorNotOK,
     _Unknown
 }
-// impl Deref for Colour {
-//     type Target = usize;
-//     fn deref(&self) -> &Self::Target {
-//         self as &usize
-//     }
-// }
-
 
 #[cfg(test)]
 mod tests {
-    use crate::{Dispenser, _TEST_API_STRING, _TEST_CAPACITY};
+    use super::*;
 
     #[tokio::test]
-    async fn refill_test() {
+    async fn refill() {
         let mut toti = Dispenser::new(_TEST_API_STRING.to_owned(), _TEST_CAPACITY).await;
         println!("Initial level: {}",toti.level_check());
         let _ = toti.spit();
@@ -141,12 +179,55 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn creation_works() {
+    async fn creation_and_spitting() {
         let mut toti = Dispenser::new(_TEST_API_STRING.to_owned(), _TEST_CAPACITY).await;
         assert_eq!(toti.level_check(), _TEST_CAPACITY);
         assert_eq!(_TEST_CAPACITY, toti.capacity);
         assert_eq!(_TEST_API_STRING,toti.webapi);
-        assert!(!toti.spit().is_air())
+        assert!(toti.spit().is_water())
+    }
+
+    #[tokio::test]
+    async fn no_air_bubbles() {
+        use rand::Rng;
+
+        let mut rng = rand::thread_rng();
+        let TEST_AMT : usize = rng.gen_range(5..10);
+
+        println!("Testing with {TEST_AMT} requests.");
+        let mut toti = Dispenser::new(_TEST_API_STRING.to_owned(), TEST_AMT).await;
+        let mut k = 0;
+        while toti.spit().is_water() {
+            k += 1;
+        }
+        assert_eq!(k,TEST_AMT);
+    }
+
+    #[tokio::test]
+    async fn clean_water() {
+        /// All Water should be clean. Responses should all be alright.
+        use rand::Rng;
+
+        let mut rng = rand::thread_rng();
+        let TEST_AMT : usize = rng.gen_range(5..10);
+
+        println!("Testing with {TEST_AMT} requests.");
+        let mut toti = Dispenser::new(_TEST_API_STRING.to_owned(), TEST_AMT).await;
+        let mut drop = toti.spit();
+        let mut k = 0;
+        while drop.is_water() {
+            if drop.colour_code() == 1 {
+                k += 1;
+            } else {
+                println!("Turbid water at: {k}\tColour: {:?}",drop.colour());
+                println!("{}",drop.condense());
+                break;
+            }
+            drop = toti.spit();
+        }
+        assert_eq!(k,TEST_AMT);
     }
 
 }
+
+

@@ -33,7 +33,8 @@ I don't know how SW versioning works. Also, I want to plugin `tokio` somewhere i
   - ~~A `Dispenser` is created with a given web API and capacity. It has a tank in which it loads the said number of responses in it.~~
   - ~~It has a _tap_ to dispense the stored cache.~~
   - ~~It has a _button_ which can be pressed to refill the tank.~~
-  - Encapsulate the responses for better UX.
+  - ~~Encapsulate the responses for better UX.~~
+    - ~~Add error code~~
   - Make sure the water comes in the tank. There are no error bubbles in the supply. (Errors due to timeout are handled.)
   - Switch to _auto-refill_ the tank after a certain time.
   - _Auto-refill_ now works based on the level of the water in the tank.
@@ -54,7 +55,7 @@ I don't know how SW versioning works. Also, I want to plugin `tokio` somewhere i
 
 - Install Purifiers. (Post process)
 
-- (Make the code Async)?
+- Benchmarking
 
 - Multi API support.
 

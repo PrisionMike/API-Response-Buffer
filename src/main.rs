@@ -24,7 +24,4 @@ async fn main() {
 
     let mut _dispenser = Dispenser::new(args.api, args.number).await;
 
-    // println!("Tank created!");
-
-    // println!("{:?}", dispenser.spit());
 }
