@@ -85,7 +85,7 @@ impl Dispenser {
                     StatusCode::INTERNAL_SERVER_ERROR => {
                         // This is for this particular TEST_API_STRING. I know that it sends a 500 when there are too much
                         // requests. Normally, I think the user will have to give the input to the dispenser on what to
-                        // do with this error. Seems like a DSL is in the stars..
+                        // do with this error. Seems like a DSL is in the stars...
                         std::thread::sleep(std::time::Duration::from_secs(1));
                         res = match client.get(&self.webapi[..]).send().await {
                             Ok(v) => v,
