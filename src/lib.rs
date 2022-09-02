@@ -1,6 +1,8 @@
 // #![allow(dead_code)]
 // #![allow(unused_imports)]
 
+/// A Dispenser never panics.
+
 use reqwest::{self, StatusCode};
 use std::{collections::VecDeque};
 
@@ -23,13 +25,13 @@ impl Dispenser {
             tank: VecDeque::with_capacity(capacity),
         };
 
-        dispenser.hose_the_tank(capacity).await.unwrap();
+        dispenser.hose_the_tank(capacity).await;
 
         dispenser
     }
 
     /// Fills the tank regardless of the Water quality.
-    async fn hose_the_tank(&mut self, thismuch: usize) -> Result<(), reqwest::Error> {
+    async fn hose_the_tank(&mut self, thismuch: usize) {
         
         let client = reqwest::Client::new();
 
@@ -57,7 +59,7 @@ impl Dispenser {
             self.tank.push_back(res_output);
         }
 
-        Ok(())
+        // Ok(())
     }
 
     /// Fills the tank to the assurance that all water in it is clean. i.e. All good responses.
@@ -66,15 +68,39 @@ impl Dispenser {
         let client = reqwest::Client::new();
 
         for _ in 0 .. thismuch {
-            let res = client.get(&self.webapi[..]).send().await.unwrap();
-            match res.status() {
-                StatusCode::OK => {
-                    
-                },
-                _ => panic!("Raula Pai gaya! ***{}***", res.status())
-            };
+            let mut res = client.get(&self.webapi[..]).send().await.unwrap();
+            let mut drop = Water::clear_water(String::new());
+            loop {
+                match res.status() {
+                    StatusCode::OK => {
+                        drop.data = match res.text().await {
+                            Ok(v) => v,
+                            Err(e) => {
+                                drop.salt = Colour::ResponseToTextError;
+                                e.to_string()
+                            }
+                        };
+                        break;
+                    },
+                    StatusCode::INTERNAL_SERVER_ERROR => {
+                        // This is for this particular TEST_API_STRING. I know that it sends a 500 when there are too much
+                        // requests. Normally, I think the user will have to give the input to the dispenser on what to
+                        // do with this error. Seems like a DSL is in the stars..
+                        std::thread::sleep(std::time::Duration::from_secs(1));
+                        res = match client.get(&self.webapi[..]).send().await {
+                            Ok(v) => v,
+                            Err(e) => {
+                                drop.salt = Colour::ReqwestError;
+                                drop.data = e.to_string();
+                                break;
+                            }
+                        };
+                    },
+                    _ => panic!("Server returned unexpected response.\nStatus Code: ***{}***", res.status())
+                };
+            }
 
-            self.tank.push_back(res_output);
+            self.tank.push_back(drop);
         }
 
         Ok(())
@@ -90,7 +116,7 @@ impl Dispenser {
         
         if self.level_check() < self.capacity {
             let diff = self.capacity - self.level_check();
-            self.hose_the_tank(diff).await.unwrap();
+            self.hose_the_tank(diff).await;
         } else if self.level_check() > self.capacity {
             let diff = self.level_check() - self.capacity;
             for _ in 0 .. diff {
@@ -117,9 +143,15 @@ pub struct Water {
     salt: Colour,
     /// API Response or error string
     data: String,
-    response_code: Option<reqwest::StatusCode>
+    response_code: Option<StatusCode>
 }
 impl Water {
+
+    /// Generator for clear water.
+    pub fn clear_water(_data: String) -> Water {
+        Water { salt: Colour::Clear, data: _data, response_code: Some(StatusCode::OK) }
+    }
+
     /// This function will likely consume the enum instance. Thus the name.
     pub fn condense(self) -> String {
         self.data
@@ -163,6 +195,7 @@ pub enum Colour {
     ErrorNotOK,
     _Unknown
 }
+#[allow(non_snake_case)]
 
 #[cfg(test)]
 mod tests {
