@@ -238,7 +238,7 @@ mod tests {
 
     #[tokio::test]
     async fn clean_water() {
-        /// All Water should be clean. Responses should all be alright.
+        /// All Water should be clean. Responses should all be alright..
         use rand::Rng;
 
         let mut rng = rand::thread_rng();
