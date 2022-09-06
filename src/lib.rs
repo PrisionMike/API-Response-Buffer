@@ -4,7 +4,7 @@
 /// A Dispenser never panics.
 
 use reqwest::{self, StatusCode};
-use std::{collections::VecDeque};
+use std::{collections::VecDeque, time::SystemTime};
 
 pub const _TEST_API_STRING: &str = "https://qrng.anu.edu.au/API/jsonI.php?length=10&type=hex16&size=2";
 pub const _EMPTY_TANK_WARNING: &str = "!EMPTY_TANK";
@@ -15,6 +15,8 @@ pub struct Dispenser {
     webapi: String,
     capacity: usize,
     tank: VecDeque<Water>,
+    last_prune_check_at: Option<SystemTime>,
+    refill_check_interval_secs: Option<usize>,
 }
 impl Dispenser {
 
@@ -23,9 +25,12 @@ impl Dispenser {
             webapi,
             capacity,
             tank: VecDeque::with_capacity(capacity),
+            last_prune_check_at: None,
+            refill_check_interval_secs: None,
         };
 
         dispenser.fill_the_tank(capacity).await;
+        dispenser.last_prune_check_at = time::
 
         dispenser
     }
@@ -63,7 +68,7 @@ impl Dispenser {
     }
 
     /// Fills the tank to the assurance that all water in it is clean. i.e. All good responses.
-    async fn fill_the_tank(&mut self, thismuch: usize) -> Result<(), reqwest::Error> {
+    async fn fill_the_tank(&mut self, thismuch: usize)  {
         
         let client = reqwest::Client::new();
 
@@ -103,14 +108,27 @@ impl Dispenser {
             self.tank.push_back(drop);
         }
 
-        Ok(())
+        // Ok(())
+    }
+
+    fn auto_prune(&mut self) {
+        if self.auto_refill {
+            if self.level_check() < self.capacity {
+
+            }
+        }
     }
 
     pub fn spit(&mut self) -> Water {
-        match self.tank.pop_front() {
+
+        let response = match self.tank.pop_front() {
             Some(v) => v,
             None => Water::air(),
-        }
+        };
+
+        self.auto_prune();
+
+        response
     }
     pub async fn refill_or_prune(&mut self) {
         

@@ -38,6 +38,7 @@ I don't know how SW versioning works.
   - ~~Github tests.~~
   - ~~Make sure the water comes in the tank. There are no error bubbles in the supply. (Errors due to timeout are handled.)~~
   - Switch to _auto-refill_ the tank after a certain time.
+    - Ask user before enabling auto-refill.
   - _Auto-refill_ now works based on the level of the water in the tank.
 
 - Make the async await flow sensible.
