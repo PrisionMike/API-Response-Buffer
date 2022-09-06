@@ -25,13 +25,13 @@ impl Dispenser {
             tank: VecDeque::with_capacity(capacity),
         };
 
-        dispenser.hose_the_tank(capacity).await;
+        dispenser.fill_the_tank(capacity).await;
 
         dispenser
     }
 
     /// Fills the tank regardless of the Water quality.
-    async fn hose_the_tank(&mut self, thismuch: usize) {
+    async fn _hose_the_tank(&mut self, thismuch: usize) {
         
         let client = reqwest::Client::new();
 
@@ -116,7 +116,7 @@ impl Dispenser {
         
         if self.level_check() < self.capacity {
             let diff = self.capacity - self.level_check();
-            self.hose_the_tank(diff).await;
+            self.fill_the_tank(diff).await;
         } else if self.level_check() > self.capacity {
             let diff = self.level_check() - self.capacity;
             for _ in 0 .. diff {
