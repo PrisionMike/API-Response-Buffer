@@ -200,6 +200,9 @@ pub enum Colour {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::thread;
+    use std::time::Duration;
+    use rand::Rng;
 
     #[tokio::test]
     async fn refill() {
@@ -222,7 +225,7 @@ mod tests {
 
     #[tokio::test]
     async fn no_air_bubbles() {
-        use rand::Rng;
+        
 
         let mut rng = rand::thread_rng();
         let TEST_AMT : usize = rng.gen_range(5..10);
@@ -259,6 +262,32 @@ mod tests {
             drop = toti.spit();
         }
         assert_eq!(k,TEST_AMT);
+    }
+
+    fn draw_n(tank: &mut Dispenser, n: usize) {
+        for _ in 0 .. n {
+            let _ = (*tank).spit();
+        }
+    }
+
+    #[tokio::test]
+    async fn timed_auto_refill() {
+        const TEST_CAPACITY: usize = 15;
+        let mut dispenser = Dispenser::new( _TEST_API_STRING.to_owned(), TEST_CAPACITY).await;
+        println!("Created a dispenser with capacity: {TEST_CAPACITY}");
+
+        let mut rng = rand::thread_rng();
+        let TEST_AMT : usize = rng.gen_range(2..5);
+        println!("Spitting {TEST_AMT} values");
+
+        draw_n(&mut dispenser, TEST_AMT);
+
+        let sleep_time = 5;
+        println!("Sleeping for {sleep_time} seconds");
+        thread::sleep(Duration::from_secs(sleep_time));
+
+        assert_eq!(dispenser.level_check(), TEST_CAPACITY);
+
     }
 
 }

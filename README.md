@@ -26,7 +26,7 @@ The whole "Supply System" will be a portable WASM module. It will have _imports_
 
 ## Roadmap.
 
-I don't know how SW versioning works. Also, I want to plugin `tokio` somewhere in here but I can't even imagine where it will lie in my project.
+I don't know how SW versioning works.
 
 - **v0.1.0** A command line binary that can work as a tank of API responses.
 
