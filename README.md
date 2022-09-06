@@ -35,7 +35,7 @@ I don't know how SW versioning works. Also, I want to plugin `tokio` somewhere i
   - ~~It has a _button_ which can be pressed to refill the tank.~~
   - ~~Encapsulate the responses for better UX.~~
     - ~~Add error code~~
-  - Github tests.
+  - ~~Github tests.~~
   - Make sure the water comes in the tank. There are no error bubbles in the supply. (Errors due to timeout are handled.)
   - Switch to _auto-refill_ the tank after a certain time.
   - _Auto-refill_ now works based on the level of the water in the tank.
