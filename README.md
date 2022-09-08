@@ -38,6 +38,7 @@ I don't know how SW versioning works.
   - ~~Github tests.~~
   - ~~Make sure the water comes in the tank. There are no error bubbles in the supply. (Errors due to timeout are handled.)~~
   - Switch to _auto-refill_ the tank after a certain time.
+    - When the tank is created, a separate thread is created which periodically checks the tank level and prunes the tank accordingly. It is agnostic of the last time the tank was used, its level was checked, etc.
     - Ask user before enabling auto-refill.
   - _Auto-refill_ now works based on the level of the water in the tank.
 

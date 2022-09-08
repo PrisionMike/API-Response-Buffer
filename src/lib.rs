@@ -4,19 +4,22 @@
 /// A Dispenser never panics.
 
 use reqwest::{self, StatusCode};
-use std::{collections::VecDeque, time::SystemTime};
+use std::{collections::VecDeque};
+use std::time::Instant;
 
 pub const _TEST_API_STRING: &str = "https://qrng.anu.edu.au/API/jsonI.php?length=10&type=hex16&size=2";
 pub const _EMPTY_TANK_WARNING: &str = "!EMPTY_TANK";
 pub const _TEST_CAPACITY: usize = 3;
+pub const DEFAULT_REFILL_INTERVAL_MILIS: u64 = 20_000;
 
 #[derive(Debug)]
 pub struct Dispenser {
     webapi: String,
     capacity: usize,
     tank: VecDeque<Water>,
-    last_prune_check_at: Option<SystemTime>,
-    refill_check_interval_secs: Option<usize>,
+    enable_refill: bool,
+    last_refill_check_at: Option<Instant>,
+    refill_check_interval_milis: Option<u64>,
 }
 impl Dispenser {
 
@@ -25,12 +28,16 @@ impl Dispenser {
             webapi,
             capacity,
             tank: VecDeque::with_capacity(capacity),
-            last_prune_check_at: None,
-            refill_check_interval_secs: None,
+            enable_refill: false,
+            last_refill_check_at: None,
+            refill_check_interval_milis: None,
         };
 
         dispenser.fill_the_tank(capacity).await;
-        dispenser.last_prune_check_at = time::
+        
+        dispenser.enable_refill = true;
+        dispenser.last_refill_check_at = Some(Instant::now());
+        dispenser.refill_check_interval_milis = Some(DEFAULT_REFILL_INTERVAL_MILIS);
 
         dispenser
     }
@@ -91,7 +98,7 @@ impl Dispenser {
                         // This is for this particular TEST_API_STRING. I know that it sends a 500 when there are too much
                         // requests. Normally, I think the user will have to give the input to the dispenser on what to
                         // do with this error. Seems like a DSL is in the stars...
-                        std::thread::sleep(std::time::Duration::from_secs(1));
+                        std::thread::sleep(std::time::Duration::from_millis(100));
                         res = match client.get(&self.webapi[..]).send().await {
                             Ok(v) => v,
                             Err(e) => {
@@ -111,22 +118,12 @@ impl Dispenser {
         // Ok(())
     }
 
-    fn auto_prune(&mut self) {
-        if self.auto_refill {
-            if self.level_check() < self.capacity {
-
-            }
-        }
-    }
-
     pub fn spit(&mut self) -> Water {
 
         let response = match self.tank.pop_front() {
             Some(v) => v,
             None => Water::air(),
         };
-
-        self.auto_prune();
 
         response
     }
@@ -282,29 +279,80 @@ mod tests {
         assert_eq!(k,TEST_AMT);
     }
 
-    fn draw_n(tank: &mut Dispenser, n: usize) {
+    /// Draws up to n responses from the dispenser. n is chosen at random from 1
+    /// to N
+    fn draw_n(tank: &mut Dispenser, N: usize) -> usize {
+        let mut rng = rand::thread_rng();
+        let n = rng.gen_range(1..=N);
         for _ in 0 .. n {
             let _ = (*tank).spit();
         }
+        n
     }
 
+    /// Random delay from 0 to S miliseconds.
+    fn random_delay(S: u64) {
+        let mut rng = rand::thread_rng();
+        let s = rng.gen_range(0..=S);
+        thread::sleep(Duration::from_millis(s));
+    }
+
+    fn wait_untill(expected_duration: Duration, initial_instance: Instant) {
+        
+        let time_now = Instant::now();
+        if initial_instance.elapsed() < expected_duration {
+            thread::sleep(expected_duration - time_now.duration_since(initial_instance));
+        }
+    }
+
+    /// BEHAVIOUR: The dispenser should periodically check itself. If the level is anything less than full,
+    /// it should correct itself to the full level by spilling or pulling more responses.
     #[tokio::test]
     async fn timed_auto_refill() {
+
         const TEST_CAPACITY: usize = 15;
+        const MAX_DRAWS: usize = 2;
+        const DELTA: u64 = 500; // The extra margin of time allowed over the refill interval.
+        const MAX_RANDOM_DELAY: u64 = 2_500;
+        const MAX_DRAWS_AT_ONCE: usize = 5;
+
+
         let mut dispenser = Dispenser::new( _TEST_API_STRING.to_owned(), TEST_CAPACITY).await;
         println!("Created a dispenser with capacity: {TEST_CAPACITY}");
 
-        let mut rng = rand::thread_rng();
-        let TEST_AMT : usize = rng.gen_range(2..5);
-        println!("Spitting {TEST_AMT} values");
+        for i in 0..=MAX_DRAWS {
+            println!("i: {i}");
+            let lower_bound_time = Instant::now();
 
-        draw_n(&mut dispenser, TEST_AMT);
+            for j in 0..i {
+                println!("j: {j}");
+                random_delay(MAX_RANDOM_DELAY);
+                draw_n(&mut dispenser, MAX_DRAWS_AT_ONCE);
+            }
+            let level_after_draws = dispenser.level_check();
+            wait_untill(Duration::from_millis( DEFAULT_REFILL_INTERVAL_MILIS + DELTA ), lower_bound_time);
 
-        let sleep_time = 5;
-        println!("Sleeping for {sleep_time} seconds");
-        thread::sleep(Duration::from_secs(sleep_time));
+            let upper_bound_time = Instant::now();
+            let lrca = dispenser.last_refill_check_at.unwrap();
+            if lrca < lower_bound_time ||  lrca > upper_bound_time {
+                println!("Lower bound on time: {:?}", lower_bound_time);                    
+                println!("Upper bound on time: {:?}", upper_bound_time);
+                println!("Tank last checked at: {:?}", dispenser.last_refill_check_at.unwrap());                    
 
-        assert_eq!(dispenser.level_check(), TEST_CAPACITY);
+                panic!("Tank level not checked in the expected interval");
+            }
+
+            if dispenser.level_check() > level_after_draws {
+                assert!(true);
+            } else {
+                thread::sleep(Duration::from_millis(DEFAULT_REFILL_INTERVAL_MILIS));
+                if dispenser.level_check() < level_after_draws {
+                    panic!("The tank doesn't seem to be recharging.")
+                }
+            }
+            assert!(true)
+
+        }
 
     }
 
